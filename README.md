@@ -1,93 +1,100 @@
-# Skill Template
+# fyers-trading — an Agent Skill for the FYERS API v3
 
-A portable **Agent Skill** template that imports cleanly into **Claude Code**,
-**Cursor**, and **Open Claw**. A skill is a folder of instructions (and
-optional scripts/references) that an AI coding agent loads on demand to perform
-a specialized task.
+A portable **Agent Skill** that helps AI coding agents build **trading strategies,
+automation bots, and backtesting scripts** on the official **FYERS Developer API v3**
+(Indian markets — NSE/BSE/MCX). It imports cleanly into **Claude Code**, **Cursor**,
+and **Open Claw**.
+
+It targets the *public developer API* (`https://api-t1.fyers.in` + the `fyers-apiv3`
+SDK + WebSocket feeds) — **not** the FIA chat-assistant proxy (`fia.fyers.in`).
 
 ## What's in here
 
 ```
-.
-├── SKILL.md            # The skill itself: frontmatter + instructions (start here)
-├── README.md           # This file
-├── LICENSE             # MIT
-├── scripts/
-│   └── example.sh      # Sample helper script the skill can call
-├── references/
-│   └── reference.md    # Sample reference doc loaded on demand
-└── assets/
-    └── .gitkeep        # Drop templates, images, fixtures here
+SKILL.md                  # The skill: frontmatter + instructions (start here)
+.env.example              # FYERS_APP_ID / FYERS_SECRET_ID / FYERS_REDIRECT_URI
+references/               # Loaded on demand (progressive disclosure)
+  auth.md                 #   OAuth v3 flow, appIdHash, daily token, refresh
+  endpoints.md            #   Full path + payload + ENUM CODE catalog
+  symbols.md              #   Symbol format (eq/fut/opt, weekly vs monthly), masters
+  market-data.md          #   quotes / depth / history / option chain / status
+  orders.md               #   place/modify/cancel, GTT, smart orders, positions
+  websocket.md            #   data / order / TBT sockets
+  backtesting.md          #   candles -> DataFrame -> strategy -> costs/pitfalls
+  rate-limits.md          #   10/s, 200/min, 100k/day; error codes; retry policy
+scripts/
+  fyers_login.py          #   OAuth login + daily token cache (~/.fyers/token.json)
+  fyers_client.py         #   reusable REST client (dry-run orders, 429 backoff)
+  example_strategy.py     #   data -> signal -> DRY-RUN order skeleton
+  validate-skill.sh       #   lints SKILL.md before importing
+assets/                   # fixtures / images
 ```
 
-The contract is `SKILL.md`. It has two parts:
+## Quick start (as a developer using this skill)
 
-1. **YAML frontmatter** — metadata the host reads to decide *whether* to load
-   the skill. The two fields every host respects are `name` and `description`.
-   Make `description` specific and trigger-rich; it's all the agent sees when
-   choosing the skill.
-2. **Body (Markdown)** — the instructions the agent reads *after* the skill is
-   invoked. Reference scripts and docs by relative path so they're pulled in
-   only when needed.
+1. Create an app at https://myapi.fyers.in/dashboard/ and note the app id, secret,
+   and redirect URI.
+2. `cp .env.example .env` and fill in the values (or export them as env vars).
+3. Authenticate: `python scripts/fyers_login.py` (caches the daily token).
+4. Verify: `python scripts/fyers_client.py profile`.
+5. Ask your agent to build a strategy/bot/backtest — it will load the right reference.
 
-## Quick start
+## Safety model (real money)
 
-1. Copy this folder and rename it to your skill (kebab-case, e.g. `make-pdf`).
-2. Edit `SKILL.md`: set `name`, write a sharp `description`, replace the body.
-3. Put runnable logic in `scripts/`, long lookup material in `references/`.
-4. Keep the body short — link out to references instead of inlining everything.
+The skill enforces these in any code it generates:
+- Secrets via environment variables only — never hardcoded or committed.
+- **Order placement is dry-run by default**; live trading needs an explicit opt-in.
+- Confirm before any live place/modify/cancel.
+- Respect rate limits (10/s · 200/min · 100k/day; order ops ≤10/s).
+- Use WebSocket for live ticks, not polling.
+- Tokens expire daily — a 401 means re-login, not retry.
 
 ## Importing the skill
 
+The skill's folder name should match its `name:` (`fyers-trading`). Copy the repo (or a
+folder containing `SKILL.md`, `references/`, `scripts/`, `.env.example`) into the host's
+skills directory.
+
 ### Claude Code
-
-Skills live in a `skills/` directory under a `.claude` folder. The skill's
-folder name must match its `name:` field.
-
 ```bash
-# Per-project (checked into the repo):
-mkdir -p .claude/skills
-cp -r my-skill .claude/skills/my-skill
-
-# Or per-user (available in every project):
-mkdir -p ~/.claude/skills
-cp -r my-skill ~/.claude/skills/my-skill
+mkdir -p .claude/skills/fyers-trading        # per-project
+# or: ~/.claude/skills/fyers-trading          # per-user
+cp -r SKILL.md references scripts .env.example .claude/skills/fyers-trading/
 ```
-
-Invoke it with `/my-skill`, or just describe the task and let Claude pick it up
-from the `description`.
+Invoke with `/fyers-trading`, or just describe a FYERS task.
 
 ### Cursor
-
-Place the skill folder under `.cursor/skills/` in your project:
-
 ```bash
-mkdir -p .cursor/skills
-cp -r my-skill .cursor/skills/my-skill
+mkdir -p .cursor/skills/fyers-trading
+cp -r SKILL.md references scripts .env.example .cursor/skills/fyers-trading/
 ```
-
-Cursor reads the same `SKILL.md` frontmatter. Reload the window after copying.
+Reload the window after copying.
 
 ### Open Claw
-
-Open Claw discovers skills from its skills directory:
-
 ```bash
-mkdir -p ~/.openclaw/skills
-cp -r my-skill ~/.openclaw/skills/my-skill
+mkdir -p ~/.openclaw/skills/fyers-trading
+cp -r SKILL.md references scripts .env.example ~/.openclaw/skills/fyers-trading/
 ```
 
-> Paths vary by host version. If a host can't find the skill, check its docs
-> for the active skills directory and confirm the folder name matches `name:`.
+> Skills-directory paths vary by host version. If a host can't find the skill, check
+> its docs for the active skills directory and confirm the folder name matches `name:`.
 
-## Authoring tips
+## Validate before importing
 
-- **One job per skill.** Narrow skills are easier for the agent to choose.
-- **Description does the routing.** Write it from the user's point of view —
-  include the words they'd actually type.
-- **Scripts over prose** for deterministic work. Markdown for judgment.
-- **Validate before committing:** `./scripts/validate-skill.sh SKILL.md`
-- **Version it.** Bump `version:` in frontmatter on meaningful changes.
+```bash
+./scripts/validate-skill.sh SKILL.md
+python -m py_compile scripts/*.py
+```
+
+## Notes & caveats
+
+- Built against FYERS API **v3** (`api-t1.fyers.in`). Span-margin and EDIS still use v2
+  (`api.fyers.in/api/v2`).
+- The exact access-token TTL isn't published; `fyers_login.py --check` verifies liveness
+  by calling `/profile` rather than guessing an expiry.
+- The refresh-token flow may be discontinued by FYERS — daily re-login is the reliable
+  path. Verify against the live docs (https://myapi.fyers.in/docsv3) if you depend on it.
+- For WebSocket streaming, install the official SDK: `pip install fyers-apiv3`.
 
 ## License
 

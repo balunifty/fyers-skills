@@ -1,0 +1,6 @@
+context/
+tasks/
+*.pyc
+__pycache__/
+.env
+.fyers/

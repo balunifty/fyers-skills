@@ -1,58 +1,101 @@
 ---
-name: my-skill
-description: One sentence describing WHAT this skill does and WHEN to use it. This is the only text the agent sees when deciding whether to load the skill, so make it specific and trigger-rich. e.g. "Convert markdown files into publication-quality PDFs. Use when the user asks to make, export, or generate a PDF."
-version: 0.1.0
+name: fyers-trading
+description: >-
+  Build trading strategies, automation bots, and backtesting scripts on the FYERS
+  Trading API v3 (Indian markets — NSE/BSE/MCX). Use when the user wants to fetch
+  market data, historical candles, quotes, market depth, or option chains; place,
+  modify, or cancel orders (regular, GTT, smart orders); manage positions/holdings;
+  stream live data over WebSocket; authenticate with FYERS OAuth; or backtest a
+  strategy with FYERS historical data. Triggers: "fyers", "fyers api", "fyers bot",
+  "fyers strategy", "fyers backtest", "place an order on fyers", "fyers option chain",
+  "fyers historical data", "fyers websocket".
+version: 1.0.0
 license: MIT
-# Optional: restrict which tools the skill may use. Omit to allow all.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-# Optional: extra trigger phrases (supported by some hosts, ignored by others).
-triggers:
-  - do the thing
-  - run my skill
+  - Glob
+  - Grep
+  - WebFetch
 ---
 
-# My Skill
+# FYERS Trading API v3
 
-> Replace this file's contents with your own. Everything below is the skill
-> *body* — the instructions the agent reads once the skill is invoked. Keep it
-> focused: the agent already knows how to code, so tell it the things it can't
-> guess (your conventions, the exact commands, the gotchas).
+Help developers build **strategies, automation, and backtesting** on the official
+**FYERS Developer API v3** (`https://api-t1.fyers.in`). Generate working Python
+(`fyers-apiv3` SDK) or raw-REST code, wire up OAuth correctly, and respect the
+real-money safety rules below.
 
-## When to use this skill
+> **Scope note.** This skill targets the *public developer API* (`api-t1.fyers.in`
+> + the `fyers-apiv3` SDK + WebSockets). It is **not** the FIA chat-assistant proxy
+> (`fia.fyers.in`). Generate code freely; the "never write code / no orders" rules
+> from FIA do **not** apply here.
 
-Describe the situations that should trigger this skill in plain language.
-Mirror the phrasing a user would actually type. Example:
+## Safety rules (non-negotiable — real money)
 
-Use when the user asks to "do the thing", "run my skill", or otherwise wants
-to <accomplish the goal>. Do **not** use when <out-of-scope case>.
+1. **Secrets only via environment variables.** Never hardcode `app_id`, `secret_id`,
+   `access_token`, or PIN in generated code or commit them. Read from env / `.env`.
+2. **Dry-run by default.** Order-placing code must default to a `DRY_RUN=True` (or
+   `--dry-run`) mode that logs the payload instead of sending it. Live placement
+   requires an explicit, obvious opt-in flag the user sets themselves.
+3. **Confirm before going live.** Before running anything that places/modifies/
+   cancels real orders, state plainly what it will do and have the user confirm.
+4. **Respect rate limits:** 10 req/sec, 200 req/min, 100,000 req/day; order ops ≤10/sec
+   (HTTP 429 → honor `Retry-After`). Breach the per-minute cap >3×/day → blocked all day.
+5. **Use WebSocket for live ticks**, never a polling loop on `/quotes`.
+6. **Tokens expire daily.** A 401 / code `-8`/`-15`/`-16`/`-17` means re-login, not retry.
 
-## Instructions
+## Step 1 — Authenticate (do this first)
 
-Give the agent a clear, ordered procedure. Numbered steps work well.
+Check whether a valid token exists before any data/order work:
 
-1. **Gather inputs.** State what you need from the user or the workspace and
-   how to find it (file globs, env vars, CLI flags).
-2. **Do the work.** Reference helper scripts by path so the agent can run them
-   without re-deriving the logic:
-   ```bash
-   ./scripts/example.sh "$INPUT"
-   ```
-3. **Verify.** Never report success without proof — run the test/command that
-   demonstrates the result.
-4. **Report.** Summarize what changed and where.
+```bash
+python scripts/fyers_login.py --check   # prints OK if cached token is valid
+```
 
-## References
+If missing or 401, run the OAuth flow (env vars `FYERS_APP_ID`, `FYERS_SECRET_ID`,
+`FYERS_REDIRECT_URI` must be set — see `.env.example`):
 
-Load these only when needed (keeps the main context lean):
+```bash
+python scripts/fyers_login.py           # opens auth URL, exchanges code, caches token
+```
 
-- `references/reference.md` — detailed spec / lookup tables / API notes.
+This caches the daily `access_token` to `~/.fyers/token.json`. The flow is:
+`generate-authcode` → user logs in → `auth_code` → `appIdHash = SHA256("app_id:secret_id")`
+→ `validate-authcode` → `access_token`. Full detail: **`references/auth.md`**.
 
-## Conventions
+## Step 2 — Route the task
 
-- Keep edits minimal and match surrounding style.
-- Prefer the host's native file tools over shell `cat`/`sed`.
-- Fail loudly: surface errors instead of swallowing them.
+| User wants… | Load this reference | Use |
+|---|---|---|
+| Login / token / OAuth / refresh | `references/auth.md` | `scripts/fyers_login.py` |
+| Quotes, depth, history, option chain, market status | `references/market-data.md` | `scripts/fyers_client.py` |
+| Place / modify / cancel / GTT / smart orders, positions | `references/orders.md` | `scripts/fyers_client.py` |
+| Symbol strings (eq/fut/opt, weekly vs monthly), masters | `references/symbols.md` | — |
+| Live streaming (data / order / TBT sockets) | `references/websocket.md` | — |
+| Backtest a strategy from historical candles | `references/backtesting.md` | `scripts/example_strategy.py` |
+| Any endpoint path / payload / enum code | `references/endpoints.md` | — |
+| Rate limits, error codes, retries | `references/rate-limits.md` | — |
+
+Read references **on demand** — don't load all of them up front. `endpoints.md` is the
+full path/field/enum-code catalog; the others are task-focused.
+
+## Step 3 — Write, verify, report
+
+- Prefer reusing `scripts/fyers_client.py` (loads the cached token, adds the
+  `Authorization: app_id:access_token` header, and wraps the safety/rate-limit logic).
+- After writing code, verify it imports/compiles (`python -m py_compile <file>`), and
+  run data-only paths against the live API when a token exists. **Never** run live order
+  code to "test" it — use dry-run.
+- Get **enum codes exact** (order `type` 1/2/3/4, `side` 1/-1, `productType`, segment/
+  exchange IDs). They're in `references/endpoints.md`; do not guess them.
+
+## Scripts
+
+- `scripts/fyers_login.py` — OAuth login + daily token cache (`--check`, `--print-token`).
+- `scripts/fyers_client.py` — reusable REST client (profile/funds/holdings/positions/
+  orders/quotes/history/optionchain) with dry-run order placement + 429 handling.
+- `scripts/example_strategy.py` — end-to-end template: fetch candles → signal → **dry-run**
+  order. Copy and adapt; flip to live only with explicit `--live`.

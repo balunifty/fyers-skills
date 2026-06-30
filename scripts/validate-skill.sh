@@ -37,6 +37,10 @@ if [[ -n "$name" ]] && ! grep -qE '^[a-z0-9][a-z0-9-]*$' <<<"$name"; then
 fi
 
 desc="$(grep -E '^description:' <<<"$frontmatter" | head -n1 | sed 's/^description:[[:space:]]*//')"
+if [[ "$desc" == ">"* || "$desc" == "|"* ]]; then
+  # Folded/block scalar — measure the wrapped lines that follow instead.
+  desc="$(awk '/^description:[[:space:]]*[>|]/{f=1;next} f&&/^[a-zA-Z_-]+:/{exit} f' <<<"$frontmatter" | tr -d '\n')"
+fi
 if [[ -n "$desc" && ${#desc} -lt 20 ]]; then
   warn "description is short (${#desc} chars) — make it specific and trigger-rich"
 fi
