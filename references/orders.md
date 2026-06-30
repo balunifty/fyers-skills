@@ -4,6 +4,23 @@
 > placement. Confirm with the user before any live place/modify/cancel. See the safety
 > rules in `SKILL.md`. Enum codes are in `references/endpoints.md` — use them exactly.
 
+## Before any order: validate the symbol (required)
+
+Always confirm the symbol exists in the **daily symbol master** before building or
+sending an order. A typo or stale expiry otherwise fails live with code `-300`, and the
+master also gives you the lot size to validate `qty`.
+
+```bash
+python scripts/fyers_symbols.py info NSE_CM NSE:SBIN-EQ   # found → real symbol + lot/tick
+```
+```python
+from fyers_symbols import validate_symbol
+rec = validate_symbol("NSE:SBIN-EQ")   # raises ValueError if not a tradable symbol
+assert order["qty"] % rec["minLotSize"] == 0
+```
+`fyers_client.place_order()` runs this automatically (`validate_symbol=True`) — including
+in dry-run, so a dry-run proves the symbol is real before you ever go live.
+
 ## Place a regular order — POST `/api/v3/orders/sync`
 
 ```json

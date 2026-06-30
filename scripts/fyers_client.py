@@ -141,16 +141,35 @@ class FyersClient:
         return self._get(f"{DATA_BASE}/marketStatus")
 
     # --- orders (SAFE: dry-run by default) ------------------------------------
-    def place_order(self, order: dict, dry_run: bool = True) -> dict:
+    def place_order(self, order: dict, dry_run: bool = True,
+                    validate_symbol: bool = True) -> dict:
         """Place a regular order. dry_run=True (default) only logs the payload.
 
         Set dry_run=False to actually transmit — do this only with explicit user
         consent. See references/orders.md for required fields and enum codes.
+
+        validate_symbol=True (default) confirms the symbol exists in the daily
+        symbol master BEFORE the order is built/sent, catching typos and stale
+        expiries that would otherwise fail live with code -300. This runs for
+        dry-run too, so a dry-run faithfully proves the symbol is real.
         """
         required = {"symbol", "qty", "type", "side", "productType"}
         missing = required - order.keys()
         if missing:
             raise ValueError(f"order missing required fields: {sorted(missing)}")
+
+        if validate_symbol:
+            try:
+                from .fyers_symbols import validate_symbol as _vsym
+            except ImportError:
+                from fyers_symbols import validate_symbol as _vsym
+            rec = _vsym(order["symbol"])  # raises ValueError if not a real symbol
+            lot = rec.get("minLotSize")
+            if lot and order["qty"] % lot != 0:
+                raise ValueError(
+                    f"qty {order['qty']} for {order['symbol']} must be a multiple "
+                    f"of the lot size {lot}"
+                )
         order.setdefault("limitPrice", 0)
         order.setdefault("stopPrice", 0)
         order.setdefault("disclosedQty", 0)

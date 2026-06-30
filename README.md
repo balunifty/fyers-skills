@@ -1,4 +1,4 @@
-# fyers-trading — an Agent Skill for the FYERS API v3
+# fyers-skills — an Agent Skill for the FYERS API v3
 
 A portable **Agent Skill** that helps AI coding agents build **trading strategies,
 automation bots, and backtesting scripts** on the official **FYERS Developer API v3**
@@ -25,6 +25,7 @@ references/               # Loaded on demand (progressive disclosure)
 scripts/
   fyers_login.py          #   OAuth login + daily token cache (~/.fyers/token.json)
   fyers_client.py         #   reusable REST client (dry-run orders, 429 backoff)
+  fyers_symbols.py        #   download/cache symbol masters; resolve name -> symbol
   example_strategy.py     #   data -> signal -> DRY-RUN order skeleton
   validate-skill.sh       #   lints SKILL.md before importing
 assets/                   # fixtures / images
@@ -49,31 +50,54 @@ The skill enforces these in any code it generates:
 - Use WebSocket for live ticks, not polling.
 - Tokens expire daily — a 401 means re-login, not retry.
 
-## Importing the skill
+## Installing the skill
 
-The skill's folder name should match its `name:` (`fyers-trading`). Copy the repo (or a
-folder containing `SKILL.md`, `references/`, `scripts/`, `.env.example`) into the host's
-skills directory.
+### Recommended: `npx skills add` (the [`skills`](https://github.com/vercel-labs/skills) CLI)
 
-### Claude Code
 ```bash
-mkdir -p .claude/skills/fyers-trading        # per-project
-# or: ~/.claude/skills/fyers-trading          # per-user
-cp -r SKILL.md references scripts .env.example .claude/skills/fyers-trading/
+npx skills add FyersDev/fyers-skills          # project-level (./)
+npx skills add FyersDev/fyers-skills -g        # global (user-level)
+npx skills add FyersDev/fyers-skills --all     # all skills, all detected agents, no prompts
 ```
-Invoke with `/fyers-trading`, or just describe a FYERS task.
 
-### Cursor
+This reads `SKILL.md`, installs the skill as **`fyers-skills`**, and wires it into the
+agent directories it detects. Useful flags: `-a/--agent <agents>` to target specific
+agents, `-l/--list` to preview without installing, `--copy` to copy files instead of
+symlinking. List or remove later with `npx skills list` / `npx skills remove fyers-skills`.
+
+> **Requires a public repo.** `skills add` fetches over public GitHub and has no
+> private-repo/token support — if `FyersDev/fyers-skills` is private the command 404s.
+> Make the repo public, or use the manual install below.
+
+### Manual install (works with a private repo over SSH)
+
+The skill's folder name should match its `name:` (`fyers-skills`). Clone the repo, then
+copy `SKILL.md`, `references/`, `scripts/`, and `.env.example` into the host's skills
+directory:
+
 ```bash
-mkdir -p .cursor/skills/fyers-trading
-cp -r SKILL.md references scripts .env.example .cursor/skills/fyers-trading/
+git clone git@github.com:FyersDev/fyers-skills.git && cd fyers-skills
+```
+
+**Claude Code**
+```bash
+mkdir -p .claude/skills/fyers-skills        # per-project
+# or: ~/.claude/skills/fyers-skills          # per-user
+cp -r SKILL.md references scripts .env.example .claude/skills/fyers-skills/
+```
+Invoke with `/fyers-skills`, or just describe a FYERS task.
+
+**Cursor**
+```bash
+mkdir -p .cursor/skills/fyers-skills
+cp -r SKILL.md references scripts .env.example .cursor/skills/fyers-skills/
 ```
 Reload the window after copying.
 
-### Open Claw
+**Open Claw**
 ```bash
-mkdir -p ~/.openclaw/skills/fyers-trading
-cp -r SKILL.md references scripts .env.example ~/.openclaw/skills/fyers-trading/
+mkdir -p ~/.openclaw/skills/fyers-skills
+cp -r SKILL.md references scripts .env.example ~/.openclaw/skills/fyers-skills/
 ```
 
 > Skills-directory paths vary by host version. If a host can't find the skill, check
