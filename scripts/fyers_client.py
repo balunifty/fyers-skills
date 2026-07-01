@@ -161,14 +161,18 @@ class FyersClient:
         if validate_symbol:
             try:
                 from .fyers_symbols import validate_symbol as _vsym
+                from .helper import validate_lot_qty, is_expired, expiry_date
             except ImportError:
                 from fyers_symbols import validate_symbol as _vsym
+                from helper import validate_lot_qty, is_expired, expiry_date
             rec = _vsym(order["symbol"])  # raises ValueError if not a real symbol
-            lot = rec.get("minLotSize")
-            if lot and order["qty"] % lot != 0:
+            lot = rec.get("minLotSize", 1)
+            validate_lot_qty(order["qty"], lot)
+            exp = rec.get("expiryDate", "")
+            if exp and is_expired(exp):
                 raise ValueError(
-                    f"qty {order['qty']} for {order['symbol']} must be a multiple "
-                    f"of the lot size {lot}"
+                    f"{order['symbol']} expired on {expiry_date(exp)} — "
+                    f"pick a later expiry"
                 )
         order.setdefault("limitPrice", 0)
         order.setdefault("stopPrice", 0)
@@ -179,9 +183,30 @@ class FyersClient:
         if dry_run:
             print("[DRY-RUN] would POST /orders/sync with:")
             print(json.dumps(order, indent=2))
-            return {"s": "dry_run", "code": 0, "message": "dry-run; nothing sent",
-                    "order": order}
-        return self._request("POST", f"{API_BASE}/orders/sync", order)
+            result = {"s": "dry_run", "code": 0, "message": "dry-run; nothing sent",
+                      "order": order}
+            try:
+                from .trade_logger import log_order  # lazy import — no hard dep
+            except ImportError:
+                from trade_logger import log_order
+            log_order(order, result, dry_run=True)
+            return result
+
+        try:
+            result = self._request("POST", f"{API_BASE}/orders/sync", order)
+        except Exception as exc:
+            try:
+                from .trade_logger import log_order
+            except ImportError:
+                from trade_logger import log_order
+            log_order(order, str(exc), dry_run=False)
+            raise
+        try:
+            from .trade_logger import log_order
+        except ImportError:
+            from trade_logger import log_order
+        log_order(order, result, dry_run=False)
+        return result
 
     def cancel_order(self, order_id: str, dry_run: bool = True) -> dict:
         if dry_run:

@@ -26,7 +26,10 @@ scripts/
   fyers_login.py          #   OAuth login + daily token cache (~/.fyers/token.json)
   fyers_client.py         #   reusable REST client (dry-run orders, 429 backoff)
   fyers_symbols.py        #   download/cache symbol masters; resolve name -> symbol
+  helper.py               #   token-free order utilities: lot validation, tick rounding, DTE
+  option_chain.py         #   option chain helpers: parse, ATM, PCR, straddle, max pain
   example_strategy.py     #   data -> signal -> DRY-RUN order skeleton
+  trade_logger.py         #   append-only JSONL audit log (~/.fyers/trades.jsonl)
   validate-skill.sh       #   lints SKILL.md before importing
 assets/                   # fixtures / images
 ```

@@ -15,11 +15,15 @@ python scripts/fyers_symbols.py info NSE_CM NSE:SBIN-EQ   # found → real symbo
 ```
 ```python
 from fyers_symbols import validate_symbol
-rec = validate_symbol("NSE:SBIN-EQ")   # raises ValueError if not a tradable symbol
-assert order["qty"] % rec["minLotSize"] == 0
+from helper import order_checks
+
+rec = validate_symbol("NSE:BANKNIFTY26JUL65000CE")  # raises if symbol not real
+result = order_checks("NSE:BANKNIFTY26JUL65000CE", qty=30, price=805.03, master_record=rec)
+# result = {'qty': 30, 'price': 805.05, 'lot_size': 30, 'warnings': ['price rounded ...']}
 ```
-`fyers_client.place_order()` runs this automatically (`validate_symbol=True`) — including
-in dry-run, so a dry-run proves the symbol is real before you ever go live.
+`fyers_client.place_order()` runs symbol existence + lot-size + expiry checks automatically
+(`validate_symbol=True` default) — including in dry-run. For full pre-flight (tick rounding,
+DTE warnings), call `order_checks()` from `scripts/helper.py` before building the order.
 
 ## Place a regular order — POST `/api/v3/orders/sync`
 

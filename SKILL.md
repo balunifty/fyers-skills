@@ -76,7 +76,8 @@ This caches the daily `access_token` to `~/.fyers/token.json`. The flow is:
 | User wants… | Load this reference | Use |
 |---|---|---|
 | Login / token / OAuth / refresh | `references/auth.md` | `scripts/fyers_login.py` |
-| Quotes, depth, history, option chain, market status | `references/market-data.md` | `scripts/fyers_client.py` |
+| Quotes, depth, history, market status | `references/market-data.md` | `scripts/fyers_client.py` |
+| Option chain, greeks, IV, PCR, expiry selection, ATM/ITM/OTM, max pain | `references/market-data.md` | `scripts/fyers_client.py` + `scripts/option_chain.py` |
 | Place / modify / cancel / GTT / smart orders, positions | `references/orders.md` | `scripts/fyers_client.py` |
 | Symbol strings (eq/fut/opt), look up a name → exact symbol, lot/tick/expiry | `references/symbols.md` | `scripts/fyers_symbols.py` |
 | Live streaming (data / order / TBT sockets) | `references/websocket.md` | — |
@@ -104,5 +105,12 @@ full path/field/enum-code catalog; the others are task-focused.
   orders/quotes/history/optionchain) with dry-run order placement + 429 handling.
 - `scripts/fyers_symbols.py` — download/cache the daily symbol master files and resolve a
   name → exact symbol (`search` / `info` / `refresh`); no token needed (public files).
+- `scripts/helper.py` — token-free order utilities: lot/qty validation, price rounding to
+  tick size, expiry date parsing, DTE, and `order_checks()` (all pre-order checks in one call).
+- `scripts/option_chain.py` — token-free option chain helpers: `parse_chain()`, `atm_strike()`,
+  `filter_expiry()`, `pcr()`, `straddle_cost()`, `max_pain()`; CLI: `demo`.
 - `scripts/example_strategy.py` — end-to-end template: fetch candles → signal → **dry-run**
   order. Copy and adapt; flip to live only with explicit `--live`.
+- `scripts/trade_logger.py` — append-only JSONL audit log (`~/.fyers/trades.jsonl`);
+  called automatically by `fyers_client.place_order()` after every order attempt; exposes
+  `log_order()`, `log_event()`, `tail(n)`, `summary()`; CLI: `tail [--n N]` / `summary`.
