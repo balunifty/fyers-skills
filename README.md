@@ -8,6 +8,10 @@ and **Open Claw**.
 It targets the *public developer API* (`https://api-t1.fyers.in` + the `fyers-apiv3`
 SDK + WebSocket feeds) — **not** the FIA chat-assistant proxy (`fia.fyers.in`).
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=FyersDev/fyers-skills&type=Date)](https://star-history.com/#FyersDev/fyers-skills&Date)
+
 ## What's in here
 
 ```
