@@ -55,6 +55,12 @@ tick or a few bps) on entries/exits.
 - **Look-ahead bias:** decide on bar *t*, trade on bar *t+1* open. Use `.shift(1)` on signals.
 - **Survivorship bias:** delisted symbols won't be in today's master file.
 - **Partial last candle:** the most recent candle may be incomplete — drop it for backtests.
+- **Incomplete current trading day:** for day-bounded intraday strategies (enter on a
+  signal, exit at a fixed time like 15:20), if the backtest window runs through "today"
+  and that exit time hasn't happened yet, there's no real exit fill. Treating the last
+  available bar as the exit fabricates a trade that never closed. Detect this (no candle
+  at/after the exit time) and mark the position `open`/mark-to-market — exclude it from
+  win-rate and total P&L, don't silently report it as a closed trade.
 - **Timezone:** FYERS epochs are UTC; convert to `Asia/Kolkata` for session logic.
 - **Corporate actions:** raw candles aren't always split/bonus-adjusted — verify for equities.
 - **Overfitting:** validate out-of-sample; a curve fit to one period isn't a strategy.
