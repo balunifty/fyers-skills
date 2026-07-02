@@ -105,3 +105,15 @@ The skill automates Steps 1–2 and caches the token in `scripts/fyers_login.py`
 
 Make sure the app has the permissions the strategy needs, or calls return permission
 errors (HTTP 403).
+
+## Pitfall: bare 403 from `urllib`'s default User-Agent
+
+If you build requests with stdlib `urllib` instead of `requests`/the SDK, FYERS' edge
+returns a **403 with no useful body** for the default `Python-urllib/x.y` User-Agent —
+before your `appIdHash`/credentials are even checked. This is easy to misdiagnose as a
+bad `app_id`/`secret_id`/`redirect_uri` or a permissions issue (the 403 above). Always
+set a browser-like `User-Agent` header on raw `urllib` requests to `api-t1.fyers.in`
+(`scripts/fyers_login.py`'s `USER_AGENT` constant does this); the official `fyers-apiv3`
+SDK is unaffected because it's built on `requests`, which sends a different default UA.
+Also make sure any custom HTTP wrapper surfaces the response body on `HTTPError` —
+swallowing it hides which of these two causes you're looking at.

@@ -30,9 +30,9 @@ import urllib.parse
 import urllib.request
 
 try:
-    from .fyers_login import API_BASE, load_token  # when imported as a package
+    from .fyers_login import API_BASE, USER_AGENT, load_token  # when imported as a package
 except ImportError:  # when run as a script
-    from fyers_login import API_BASE, load_token
+    from fyers_login import API_BASE, USER_AGENT, load_token
 
 DATA_BASE = "https://api-t1.fyers.in/data"
 
@@ -57,6 +57,7 @@ class FyersClient:
         headers = {
             "Authorization": f"{self.app_id}:{self.access_token}",
             "Content-Type": "application/json",
+            "User-Agent": USER_AGENT,
         }
         data = json.dumps(payload).encode() if payload is not None else None
         attempt = 0

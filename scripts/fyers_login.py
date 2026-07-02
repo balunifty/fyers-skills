@@ -29,12 +29,22 @@ import json
 import os
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
 
 API_BASE = "https://api-t1.fyers.in/api/v3"
 TOKEN_PATH = Path(os.path.expanduser("~/.fyers/token.json"))
+
+# FYERS' edge rejects requests carrying urllib's default User-Agent
+# ("Python-urllib/x.y") with a bare 403 before credentials are even checked.
+# Send a browser-like one on every request. (The official fyers-apiv3 SDK
+# avoids this because it's built on `requests`, which has a different default.)
+USER_AGENT = (
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+)
 
 
 def _env(name: str) -> str:
@@ -55,10 +65,16 @@ def app_id_hash(app_id: str, secret_id: str) -> str:
 def _post(url: str, payload: dict) -> dict:
     body = json.dumps(payload).encode()
     req = urllib.request.Request(
-        url, data=body, headers={"Content-Type": "application/json"}, method="POST"
+        url, data=body,
+        headers={"Content-Type": "application/json", "User-Agent": USER_AGENT},
+        method="POST",
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read().decode())
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode(errors="ignore")
+        sys.exit(f"ERROR: HTTP {e.code} on POST {url}: {detail}")
 
 
 def generate_authcode_url(app_id: str, redirect_uri: str, state: str = "fyers_skill") -> str:
@@ -115,7 +131,10 @@ def token_is_valid(tok: dict | None) -> bool:
         return False
     req = urllib.request.Request(
         f"{API_BASE}/profile",
-        headers={"Authorization": f"{tok['app_id']}:{tok['access_token']}"},
+        headers={
+            "Authorization": f"{tok['app_id']}:{tok['access_token']}",
+            "User-Agent": USER_AGENT,
+        },
     )
     try:
         with urllib.request.urlopen(req, timeout=15) as resp:
