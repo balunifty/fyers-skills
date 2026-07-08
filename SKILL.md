@@ -98,6 +98,23 @@ full path/field/enum-code catalog; the others are task-focused.
 - Get **enum codes exact** (order `type` 1/2/3/4, `side` 1/-1, `productType`, segment/
   exchange IDs). They're in `references/endpoints.md`; do not guess them.
 
+## Strategy deliverable convention
+
+When building a **strategy, bot, or automation** (anything beyond a one-off query),
+deliver it as a **self-contained folder**, not a single script:
+
+- Create a directory named for the strategy (e.g. `strategies/sma_crossover/`) and put
+  **all** of its files inside — signal/entry logic, config, runner, `requirements.txt`
+  if needed, and a short `README.md`. Never dump a multi-part strategy into one file.
+- After the strategy is written, produce a **Mermaid flow diagram** of the algorithm
+  (data → signal → risk checks → order → logging) and save it in the folder (e.g.
+  `flow.mmd` or embedded in the folder's `README.md`) so the user can review the logic
+  at a glance. Show the diagram to the user.
+- **Always offer to build a backtest** once the original strategy is done — tell the
+  user you can backtest it against FYERS historical candles (`references/backtesting.md`,
+  `scripts/example_strategy.py`). Put the backtest in the same strategy folder when they
+  accept.
+
 ## Scripts
 
 - `scripts/fyers_login.py` — OAuth login + daily token cache (`--check`, `--print-token`).
