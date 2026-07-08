@@ -1,0 +1,7 @@
+context/
+tasks/
+*.pyc
+__pycache__/
+.env
+CLAUDE.md
+.fyers/
