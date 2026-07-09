@@ -23,6 +23,7 @@ references/               # Loaded on demand (progressive disclosure)
   orders.md               #   place/modify/cancel, GTT, smart orders, positions
   websocket.md            #   data / order / TBT sockets
   backtesting.md          #   candles -> DataFrame -> strategy -> costs/pitfalls
+  indicators.md           #   TA-Lib install + indicator wrappers reference
   rate-limits.md          #   10/s, 200/min, 100k/day; error codes; retry policy
 scripts/
   fyers_login.py          #   OAuth login + daily token cache (~/.fyers/token.json)
@@ -31,6 +32,7 @@ scripts/
   helper.py               #   token-free order utilities: lot validation, tick rounding, DTE
   option_chain.py         #   option chain helpers: parse, ATM, PCR, straddle, max pain
   example_strategy.py     #   data -> signal -> DRY-RUN order skeleton
+  indicators.py           #   TA-Lib indicator wrappers (SMA/EMA/RSI/MACD/BBANDS/ATR/...)
   trade_logger.py         #   append-only JSONL audit log (~/.fyers/trades.jsonl)
   validate-skill.sh       #   lints SKILL.md before importing
 assets/                   # fixtures / images

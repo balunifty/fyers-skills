@@ -98,6 +98,7 @@ This caches the daily `access_token` to `~/.fyers/token.json`. The flow is:
 | Symbol strings (eq/fut/opt), look up a name → exact symbol, lot/tick/expiry | `references/symbols.md` | `scripts/fyers_symbols.py` |
 | Live streaming (data / order / TBT sockets) | `references/websocket.md` | — |
 | Backtest a strategy from historical candles | `references/backtesting.md` | `scripts/example_strategy.py` |
+| Technical indicators (RSI, MACD, Bollinger, ATR, etc.) | `references/indicators.md` | `scripts/indicators.py` |
 | Any endpoint path / payload / enum code | `references/endpoints.md` | — |
 | Rate limits, error codes, retries | `references/rate-limits.md` | — |
 
@@ -144,6 +145,9 @@ deliver it as a **self-contained folder**, not a single script:
   `filter_expiry()`, `pcr()`, `straddle_cost()`, `max_pain()`; CLI: `demo`.
 - `scripts/example_strategy.py` — end-to-end template: fetch candles → signal → **dry-run**
   order. Copy and adapt; flip to live only with explicit `--live`.
+- `scripts/indicators.py` — TA-Lib wrappers for common indicators (SMA/EMA/WMA, Bollinger,
+  ADX, RSI, MACD, Stochastic, CCI, momentum, ROC, OBV, A/D, ATR/NATR); lazy `talib` import;
+  CLI: `demo`.
 - `scripts/trade_logger.py` — append-only JSONL audit log (`~/.fyers/trades.jsonl`);
   called automatically by `fyers_client.place_order()` after every order attempt; exposes
   `log_order()`, `log_event()`, `tail(n)`, `summary()`; CLI: `tail [--n N]` / `summary`.

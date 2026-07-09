@@ -43,6 +43,10 @@ df["strat_ret"] = df["signal"].shift(1) * df["ret"]    # shift(1) avoids look-ah
 equity = (1 + df["strat_ret"]).cumprod()
 ```
 
+For signals beyond simple SMA crossovers (RSI, MACD, Bollinger Bands, ATR-based stops,
+etc.), use `scripts/indicators.py` (TA-Lib wrappers) instead of hand-rolling more
+`rolling()` math — see `references/indicators.md`.
+
 ## 3. Model costs honestly
 
 A backtest that ignores costs lies. Apply per-executed-order brokerage and statutory

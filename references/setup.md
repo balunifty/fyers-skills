@@ -38,7 +38,7 @@ pip install -r requirements.txt
 |---|---|
 | `backtesting` (the `backtesting.py` package) | User wants a simpler single-instrument backtest with built-in plotting, instead of vectorbt. |
 | `backtrader` | User wants event-driven backtesting (bar-by-bar broker simulation) rather than vectorized. |
-| `ta` / `ta-lib` | Strategy needs indicators beyond what a few `pandas.rolling()` calls cover. `ta-lib` needs a system-level C library — prefer the pure-Python `ta` package unless the user already has TA-Lib installed. |
+| `TA-Lib` | Strategy needs indicators (RSI, MACD, Bollinger, ATR, etc.) beyond a few `pandas.rolling()` calls. Needs the **TA-Lib C library installed first**, then `pip install TA-Lib` — a common source of the install-error pattern in §3 below. Full install steps + usage: `references/indicators.md`, `scripts/indicators.py`. |
 | `matplotlib` | Only if the user wants custom plots beyond a backtest library's built-in charting. |
 
 ## 3. If a package install fails
