@@ -13,7 +13,9 @@ SDK + WebSocket feeds) — **not** the FIA chat-assistant proxy (`fia.fyers.in`)
 ```
 SKILL.md                  # The skill: frontmatter + instructions (start here)
 .env.example              # FYERS_APP_ID / FYERS_SECRET_ID / FYERS_REDIRECT_URI
+requirements.txt          # Default deps for generated strategy/bot/backtest code
 references/               # Loaded on demand (progressive disclosure)
+  setup.md                #   venv + install steps, package list, troubleshooting
   auth.md                 #   OAuth v3 flow, appIdHash, daily token, refresh
   endpoints.md            #   Full path + payload + ENUM CODE catalog
   symbols.md              #   Symbol format (eq/fut/opt, weekly vs monthly), masters
@@ -38,10 +40,13 @@ assets/                   # fixtures / images
 
 1. Create an app at https://myapi.fyers.in/dashboard/ and note the app id, secret,
    and redirect URI.
-2. `cp .env.example .env` and fill in the values (or export them as env vars).
-3. Authenticate: `python scripts/fyers_login.py` (caches the daily token).
-4. Verify: `python scripts/fyers_client.py profile`.
-5. Ask your agent to build a strategy/bot/backtest — it will load the right reference.
+2. Create a venv and install deps: `python3 -m venv .venv && source .venv/bin/activate
+   && pip install -r requirements.txt` (see `references/setup.md` for the package list
+   and install troubleshooting).
+3. `cp .env.example .env` and fill in the values (or export them as env vars).
+4. Authenticate: `python scripts/fyers_login.py` (caches the daily token).
+5. Verify: `python scripts/fyers_client.py profile`.
+6. Ask your agent to build a strategy/bot/backtest — it will load the right reference.
 
 ## Safety model (real money)
 

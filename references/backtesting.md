@@ -25,9 +25,13 @@ and concatenate.
 ## 2. Run a strategy
 
 Use a real backtest library rather than rolling your own P&L loop:
-- **`backtesting.py`** — simple, good for single-instrument candle strategies.
-- **`vectorbt`** — fast, vectorized, portfolio-level.
-- **`backtrader`** — feature-rich, event-driven.
+- **`vectorbt`** (default — in `requirements.txt`) — fast, vectorized, portfolio-level.
+- **`backtesting.py`** — simpler, good for single-instrument candle strategies with
+  built-in plotting; install on demand (`pip install backtesting`) if the user prefers it.
+- **`backtrader`** — feature-rich, event-driven; install on demand if the strategy needs
+  bar-by-bar broker simulation instead of vectorized backtesting.
+
+See `references/setup.md` for the full dependency list and install troubleshooting.
 
 Example signal (SMA crossover) without a framework:
 ```python

@@ -52,6 +52,21 @@ real-money safety rules below.
 6. **Use WebSocket for live ticks**, never a polling loop on `/quotes`.
 7. **Tokens expire daily.** A 401 / code `-8`/`-15`/`-16`/`-17` means re-login, not retry.
 
+## Step 0 — Set up the environment (first time only)
+
+If the user asks to "set up" the skill, or no project venv exists yet, create one and
+install the strategy-code dependencies **before** anything else:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+If a package fails to install, don't stop — install the rest, retry the failing one
+alone, and resolve it before moving on to strategy generation. Full detail, including
+the default package list and what each is for: **`references/setup.md`**.
+
 ## Step 1 — Authenticate (do this first)
 
 Check whether a valid token exists before any data/order work:
@@ -75,6 +90,7 @@ This caches the daily `access_token` to `~/.fyers/token.json`. The flow is:
 
 | User wants… | Load this reference | Use |
 |---|---|---|
+| Set up / install the skill, venv, dependencies | `references/setup.md` | — |
 | Login / token / OAuth / refresh | `references/auth.md` | `scripts/fyers_login.py` |
 | Quotes, depth, history, market status | `references/market-data.md` | `scripts/fyers_client.py` |
 | Option chain, greeks, IV, PCR, expiry selection, ATM/ITM/OTM, max pain | `references/market-data.md` | `scripts/fyers_client.py` + `scripts/option_chain.py` |
