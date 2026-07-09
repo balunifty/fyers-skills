@@ -135,6 +135,7 @@ for users who opt out of the conversational default: **`references/auth.md`**.
 | Live streaming (data / order / TBT sockets) | `references/websocket.md` | — |
 | Backtest a strategy from historical candles | `references/backtesting.md` | `scripts/example_strategy.py` |
 | Technical indicators (RSI, MACD, Bollinger, ATR, etc.) | `references/indicators.md` | `scripts/indicators.py` |
+| Visualize / report a backtest's performance (tear sheet, Sharpe, drawdown, monthly returns) | `references/quantstats.md` | `scripts/quantstats_report.py` |
 | Any endpoint path / payload / enum code | `references/endpoints.md` | — |
 | Rate limits, error codes, retries | `references/rate-limits.md` | — |
 
@@ -204,6 +205,9 @@ step*, not as a one-shot file dump:
 - `scripts/indicators.py` — TA-Lib wrappers for common indicators (SMA/EMA/WMA, Bollinger,
   ADX, RSI, MACD, Stochastic, CCI, momentum, ROC, OBV, A/D, ATR/NATR); lazy `talib` import;
   CLI: `demo`.
+- `scripts/quantstats_report.py` — QuantStats wrappers to visualize/report a backtest's
+  returns series: full HTML tear sheet, Sharpe/Sortino/drawdown/CAGR, monthly heatmap;
+  intraday→daily resampling; lazy `quantstats` import; CLI: `demo`.
 - `scripts/trade_logger.py` — append-only JSONL audit log (`~/.fyers/trades.jsonl`);
   called automatically by `fyers_client.place_order()` after every order attempt; exposes
   `log_order()`, `log_event()`, `tail(n)`, `summary()`; CLI: `tail [--n N]` / `summary`.

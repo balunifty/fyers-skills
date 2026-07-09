@@ -24,6 +24,7 @@ references/               # Loaded on demand (progressive disclosure)
   websocket.md            #   data / order / TBT sockets
   backtesting.md          #   candles -> DataFrame -> strategy -> costs/pitfalls
   indicators.md           #   TA-Lib install + indicator wrappers reference
+  quantstats.md           #   QuantStats install + tear-sheet / risk-metrics reference
   rate-limits.md          #   10/s, 200/min, 100k/day; error codes; retry policy
 scripts/
   fyers_login.py          #   OAuth login + daily token cache (~/.fyers/token.json)
@@ -33,6 +34,7 @@ scripts/
   option_chain.py         #   option chain helpers: parse, ATM, PCR, straddle, max pain
   example_strategy.py     #   data -> signal -> DRY-RUN order skeleton
   indicators.py           #   TA-Lib indicator wrappers (SMA/EMA/RSI/MACD/BBANDS/ATR/...)
+  quantstats_report.py    #   QuantStats tear sheet + risk metrics from a returns series
   trade_logger.py         #   append-only JSONL audit log (~/.fyers/trades.jsonl)
   validate-skill.sh       #   lints SKILL.md before importing
 assets/                   # fixtures / images

@@ -68,7 +68,9 @@ tick or a few bps) on entries/exits.
   and that exit time hasn't happened yet, there's no real exit fill. Treating the last
   available bar as the exit fabricates a trade that never closed. Detect this (no candle
   at/after the exit time) and mark the position `open`/mark-to-market — exclude it from
-  win-rate and total P&L, don't silently report it as a closed trade.
+  win-rate and total P&L, don't silently report it as a closed trade. (This trade-level win
+  rate is distinct from QuantStats' positive-period % — see the "Two win rates" note in
+  `references/quantstats.md`; never conflate them.)
 - **Timezone:** FYERS epochs are UTC; convert to `Asia/Kolkata` for session logic.
 - **Corporate actions:** raw candles aren't always split/bonus-adjusted — verify for equities.
 - **Overfitting:** validate out-of-sample; a curve fit to one period isn't a strategy.
@@ -78,3 +80,7 @@ tick or a few bps) on entries/exits.
 Once a strategy is validated, wire signals to `references/orders.md` — but keep
 `DRY_RUN=True` until the user explicitly opts into live trading, and paper-trade first.
 `scripts/example_strategy.py` shows the full data → signal → dry-run-order skeleton.
+
+To **visualize and report** a validated strategy's performance — a professional HTML tear
+sheet with Sharpe/Sortino/drawdown/CAGR and a monthly-returns heatmap from the `strat_ret`
+returns series above — see `references/quantstats.md` and `scripts/quantstats_report.py`.
