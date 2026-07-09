@@ -14,14 +14,6 @@ that C library is present on the system first. This is the exact "install error 
 package not available" pattern covered generally in `references/setup.md` §3; the
 steps below are the specific fix for TA-Lib.
 
-**macOS (Homebrew):**
-```bash
-brew install ta-lib                 # Apple Silicon: arch -arm64 brew install ta-lib
-export TA_INCLUDE_PATH="$(brew --prefix ta-lib)/include"
-export TA_LIBRARY_PATH="$(brew --prefix ta-lib)/lib"
-python -m pip install TA-Lib
-```
-
 **Debian/Ubuntu/Linux:** apt's `ta-lib` package (where it exists) is usually too old;
 build the C library from source, then install the Python wrapper:
 ```bash

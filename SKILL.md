@@ -52,6 +52,31 @@ real-money safety rules below.
 6. **Use WebSocket for live ticks**, never a polling loop on `/quotes`.
 7. **Tokens expire daily.** A 401 / code `-8`/`-15`/`-16`/`-17` means re-login, not retry.
 
+> **Two-gate rule for going live (elaborates rule 2 and rule 4 — doesn't replace them).**
+> Under the default conversational-execution mode, you (the agent) may run dry-run order
+> code yourself and show the real logged payload in chat. But you may invoke a *live*
+> order path yourself only when **both** gates hold: (a) the code/script itself requires
+> an explicit opt-in the user set themselves (e.g. `--live`, `DRY_RUN=False` in the file/
+> CLI — this must exist per rule 2, and you never set it on the user's behalf), **and**
+> (b) you have plain-language typed confirmation from the user in chat for that specific
+> action (per rule 4). Neither gate substitutes for the other — a flag without chat
+> confirmation, or chat confirmation without the flag, is not enough to execute live.
+
+## Default mode: conversational execution
+
+**Default behavior for any FYERS strategy/data/order task: run scripts for real, in the
+project folder, as you go — don't just generate code and hand it off.** Develop in small
+increments: write/edit one small piece of the strategy → actually run it via Bash from the
+project folder → show the real output in chat → let the user react/redirect → repeat. Never
+dump a "finished" strategy in one shot without having executed each piece along the way.
+This applies to auth setup (below), fetching data, computing signals, dry-run orders, and
+backtests (see "Strategy deliverable convention"). Everything you run must be a real,
+persistent file in the project folder (see that section) — never an inline/throwaway snippet.
+
+**Opt-out:** if the user explicitly asks only for code, or says not to run anything (e.g.
+"just give me the code", "don't run it"), fall back to generating files without executing —
+similar to this skill's older behavior.
+
 ## Step 0 — Set up the environment (first time only)
 
 If the user asks to "set up" the skill, or no project venv exists yet, create one and
@@ -67,24 +92,35 @@ If a package fails to install, don't stop — install the rest, retry the failin
 alone, and resolve it before moving on to strategy generation. Full detail, including
 the default package list and what each is for: **`references/setup.md`**.
 
-## Step 1 — Authenticate (do this first)
+## Step 1 — Authenticate (do this first, conversationally)
 
-Check whether a valid token exists before any data/order work:
+Under the default conversational-execution mode, authenticate *with* the user in chat
+rather than just pointing them at a script. Do this in the project folder:
 
-```bash
-python scripts/fyers_login.py --check   # prints OK if cached token is valid
-```
+1. **Check for a valid token yourself** by running it:
+   ```bash
+   python scripts/fyers_login.py --check   # prints OK if cached token is valid
+   ```
+2. **If missing/401 and `.env` doesn't exist yet**, scaffold it yourself: create `.env`
+   in the project folder with the same keys as `.env.example` (`FYERS_APP_ID`,
+   `FYERS_SECRET_ID`, `FYERS_REDIRECT_URI`, and `FYERS_PIN` only if the refresh-token flow
+   is needed) present but with **blank values** — never write secret values into the file,
+   and never ask the user to paste secret values into chat. Then ask the user to open
+   `.env` themselves and fill in the values, and **wait for their explicit confirmation**
+   (e.g. "done" / "filled in") before doing anything else. Do not guess and continue.
+3. **Once confirmed, run the OAuth flow yourself**:
+   ```bash
+   python scripts/fyers_login.py           # opens auth URL, exchanges code, caches token
+   ```
+   Relay the printed auth URL to the user in chat, have them log in and copy back the
+   `auth_code` (or full redirect URL), and complete the exchange in the same script run.
+4. **Confirm success yourself** — run `python scripts/fyers_client.py profile` and report
+   the real result in chat (don't assert it should work).
 
-If missing or 401, run the OAuth flow (env vars `FYERS_APP_ID`, `FYERS_SECRET_ID`,
-`FYERS_REDIRECT_URI` must be set — see `.env.example`):
-
-```bash
-python scripts/fyers_login.py           # opens auth URL, exchanges code, caches token
-```
-
-This caches the daily `access_token` to `~/.fyers/token.json`. The flow is:
+This caches the daily `access_token` to `~/.fyers/token.json`. The flow under the hood is:
 `generate-authcode` → user logs in → `auth_code` → `appIdHash = SHA256("app_id:secret_id")`
-→ `validate-authcode` → `access_token`. Full detail: **`references/auth.md`**.
+→ `validate-authcode` → `access_token`. Full detail, including the standalone/manual path
+for users who opt out of the conversational default: **`references/auth.md`**.
 
 ## Step 2 — Route the task
 
@@ -118,19 +154,39 @@ full path/field/enum-code catalog; the others are task-focused.
 ## Strategy deliverable convention
 
 When building a **strategy, bot, or automation** (anything beyond a one-off query),
-deliver it as a **self-contained folder**, not a single script:
+deliver it as a **self-contained folder**, not a single script — and, per the default
+conversational-execution mode above, build it *incrementally with real execution at each
+step*, not as a one-shot file dump:
 
 - Create a directory named for the strategy (e.g. `strategies/sma_crossover/`) and put
   **all** of its files inside — signal/entry logic, config, runner, `requirements.txt`
-  if needed, and a short `README.md`. Never dump a multi-part strategy into one file.
+  if needed, `.env` (scaffolded per Step 1), and a short `README.md`. Never dump a
+  multi-part strategy into one file. The venv, `.env`, and every module live in this one
+  folder — all scripts are run FROM here, on these real files, for the rest of the
+  conversation.
+- Build it piece by piece: write/edit one small piece (e.g. the candle-fetch, then the
+  signal, then the order stub) → run it for real via Bash from the strategy folder → show
+  the actual output in chat → let the user redirect → move to the next piece. Do not write
+  the whole strategy and then run it once at the end.
 - After the strategy is written, produce a **Mermaid flow diagram** of the algorithm
   (data → signal → risk checks → order → logging) and save it in the folder (e.g.
   `flow.mmd` or embedded in the folder's `README.md`) so the user can review the logic
   at a glance. Show the diagram to the user.
-- **Always offer to build a backtest** once the original strategy is done — tell the
-  user you can backtest it against FYERS historical candles (`references/backtesting.md`,
-  `scripts/example_strategy.py`). Put the backtest in the same strategy folder when they
-  accept.
+- **Always offer to build a backtest** once the original strategy is functional against
+  real data — tell the user you can backtest it against FYERS historical candles
+  (`references/backtesting.md`, `scripts/example_strategy.py`), and on acceptance, run the
+  backtest script yourself in the strategy folder and show the real metrics in chat, not
+  just a description of what it would show. Put the backtest in the same strategy folder
+  when they accept.
+- Order dry-runs happen the same way — run the order code yourself in dry-run and show
+  the real logged payload. Going live is gated (see the two-gate rule under the safety
+  rules above). You can also proactively surface `scripts/trade_logger.py`'s `tail`/
+  `summary` output in chat as the conversation progresses (e.g. after a dry-run or a live
+  fill), not only when the user explicitly asks for the log.
+- **Repeatability:** everything you write and run during the conversation must remain a
+  real, standalone-runnable file in the strategy folder afterward (e.g.
+  `python strategies/sma_crossover/run.py`) — the conversational execution is the
+  *development loop*, not the only way to run the result.
 
 ## Scripts
 

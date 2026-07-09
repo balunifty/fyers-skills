@@ -14,6 +14,39 @@ expired — re-login, don't retry.
 Store these in environment variables (see `.env.example`), never in code:
 `FYERS_APP_ID`, `FYERS_SECRET_ID`, `FYERS_REDIRECT_URI`.
 
+## Default path: conversational, guided auth (agent-driven)
+
+Per `SKILL.md`'s default conversational-execution mode, the agent drives this whole
+flow with the user in chat rather than telling them to go run a script alone:
+
+1. **Check first.** Run `python scripts/fyers_login.py --check` yourself. If it says
+   `OK`, you're done — report that and move on.
+2. **Scaffold `.env`, don't fill it.** If `.env` doesn't exist in the project folder,
+   create it with the same keys as `.env.example` (`FYERS_APP_ID`, `FYERS_SECRET_ID`,
+   `FYERS_REDIRECT_URI`, plus `FYERS_PIN` only if the refresh-token flow is needed) but
+   **leave every value blank**. Never write a secret value into the file yourself, and
+   never ask the user to paste a secret value into chat.
+3. **Wait for the user.** Ask them to open `.env` and fill in the values themselves,
+   directly in the file, then tell you when they've done it (e.g. "done"). Do not
+   proceed, guess values, or re-check on a timer — wait for their explicit confirmation.
+4. **Run the login yourself.** Once confirmed, run `python scripts/fyers_login.py`
+   (interactive: it prints the auth URL and then blocks on stdin for the `auth_code`).
+   Relay the printed URL to the user in chat, have them log in in their browser and copy
+   back the `auth_code` (or the full redirected URL — `extract_auth_code()` accepts
+   either), and feed it to the waiting prompt to complete the exchange.
+5. **Confirm success yourself.** Run `python scripts/fyers_client.py profile` and show
+   the real response in chat — don't assert that auth "should" now work.
+
+This is the default. If the user explicitly opts out (e.g. "just give me the code",
+"don't run anything"), fall back to the standalone/manual path below and let them run
+each step themselves.
+
+## Standalone/manual path (opt-out only)
+
+Everything below documents the underlying flow/fields the scripts above implement, and
+is also the reference for users who explicitly want to run this themselves instead of
+having the agent drive it.
+
 ## appIdHash
 
 ```

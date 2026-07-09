@@ -45,10 +45,16 @@ assets/                   # fixtures / images
 2. Create a venv and install deps: `python3 -m venv .venv && source .venv/bin/activate
    && pip install -r requirements.txt` (see `references/setup.md` for the package list
    and install troubleshooting).
-3. `cp .env.example .env` and fill in the values (or export them as env vars).
-4. Authenticate: `python scripts/fyers_login.py` (caches the daily token).
-5. Verify: `python scripts/fyers_client.py profile`.
-6. Ask your agent to build a strategy/bot/backtest — it will load the right reference.
+3. Ask your agent to build a strategy/bot/backtest. By default the agent drives setup and
+   development *with* you conversationally: it scaffolds `.env` (keys present, values
+   blank) in the project folder and waits for you to fill in the values yourself, then
+   runs the login flow and verifies it against `/profile` — see `references/auth.md`. It
+   then builds the strategy incrementally, running each piece for real and showing you
+   the output as it goes (see `SKILL.md`'s "Default mode: conversational execution").
+   If you'd rather just get code without the agent running anything, say so explicitly.
+4. Prefer to do it yourself instead? `cp .env.example .env`, fill in the values, run
+   `python scripts/fyers_login.py` (caches the daily token), then verify with
+   `python scripts/fyers_client.py profile`.
 
 ## Safety model (real money)
 

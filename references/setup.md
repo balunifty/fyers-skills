@@ -28,7 +28,7 @@ pip install -r requirements.txt
 | `fyers-apiv3` | Official SDK — WebSocket streaming (`references/websocket.md`) and a supported alternative to raw REST for auth/orders. |
 | `pandas` | Candle data → DataFrame; used throughout `references/backtesting.md`. |
 | `numpy` | Vectorized signal math (SMA, returns, indicators). |
-| `python-dotenv` | Load `FYERS_APP_ID` / `FYERS_SECRET_ID` / `FYERS_REDIRECT_URI` / `FYERS_PIN` from `.env` (see `.env.example`) instead of hand-rolling env parsing. |
+| `python-dotenv` | Load `FYERS_APP_ID` / `FYERS_SECRET_ID` / `FYERS_REDIRECT_URI` / `FYERS_PIN` from `.env` instead of hand-rolling env parsing. Under the default conversational flow the agent scaffolds `.env` (keys present, values blank) and the user fills the values in directly — see `references/auth.md` for the step-by-step; don't assume the user has already done this before you start. |
 | `vectorbt` | Default backtest engine — vectorized, fast, handles portfolio-level backtests. See `references/backtesting.md`. |
 
 **Optional, install only if the strategy needs it** (not in the default
