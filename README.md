@@ -13,7 +13,9 @@ SDK + WebSocket feeds) — **not** the FIA chat-assistant proxy (`fia.fyers.in`)
 ```
 SKILL.md                  # The skill: frontmatter + instructions (start here)
 .env.example              # FYERS_APP_ID / FYERS_SECRET_ID / FYERS_REDIRECT_URI
+requirements.txt          # Default deps for generated strategy/bot/backtest code
 references/               # Loaded on demand (progressive disclosure)
+  setup.md                #   venv + install steps, package list, troubleshooting
   auth.md                 #   OAuth v3 flow, appIdHash, daily token, refresh
   endpoints.md            #   Full path + payload + ENUM CODE catalog
   symbols.md              #   Symbol format (eq/fut/opt, weekly vs monthly), masters
@@ -21,6 +23,8 @@ references/               # Loaded on demand (progressive disclosure)
   orders.md               #   place/modify/cancel, GTT, smart orders, positions
   websocket.md            #   data / order / TBT sockets
   backtesting.md          #   candles -> DataFrame -> strategy -> costs/pitfalls
+  indicators.md           #   TA-Lib install + indicator wrappers reference
+  quantstats.md           #   QuantStats install + tear-sheet / risk-metrics reference
   rate-limits.md          #   10/s, 200/min, 100k/day; error codes; retry policy
 scripts/
   fyers_login.py          #   OAuth login + daily token cache (~/.fyers/token.json)
@@ -29,6 +33,8 @@ scripts/
   helper.py               #   token-free order utilities: lot validation, tick rounding, DTE
   option_chain.py         #   option chain helpers: parse, ATM, PCR, straddle, max pain
   example_strategy.py     #   data -> signal -> DRY-RUN order skeleton
+  indicators.py           #   TA-Lib indicator wrappers (SMA/EMA/RSI/MACD/BBANDS/ATR/...)
+  quantstats_report.py    #   QuantStats tear sheet + risk metrics from a returns series
   trade_logger.py         #   append-only JSONL audit log (~/.fyers/trades.jsonl)
   validate-skill.sh       #   lints SKILL.md before importing
 assets/                   # fixtures / images
@@ -38,10 +44,19 @@ assets/                   # fixtures / images
 
 1. Create an app at https://myapi.fyers.in/dashboard/ and note the app id, secret,
    and redirect URI.
-2. `cp .env.example .env` and fill in the values (or export them as env vars).
-3. Authenticate: `python scripts/fyers_login.py` (caches the daily token).
-4. Verify: `python scripts/fyers_client.py profile`.
-5. Ask your agent to build a strategy/bot/backtest — it will load the right reference.
+2. Create a venv and install deps: `python3 -m venv .venv && source .venv/bin/activate
+   && pip install -r requirements.txt` (see `references/setup.md` for the package list
+   and install troubleshooting).
+3. Ask your agent to build a strategy/bot/backtest. By default the agent drives setup and
+   development *with* you conversationally: it scaffolds `.env` (keys present, values
+   blank) in the project folder and waits for you to fill in the values yourself, then
+   runs the login flow and verifies it against `/profile` — see `references/auth.md`. It
+   then builds the strategy incrementally, running each piece for real and showing you
+   the output as it goes (see `SKILL.md`'s "Default mode: conversational execution").
+   If you'd rather just get code without the agent running anything, say so explicitly.
+4. Prefer to do it yourself instead? `cp .env.example .env`, fill in the values, run
+   `python scripts/fyers_login.py` (caches the daily token), then verify with
+   `python scripts/fyers_client.py profile`.
 
 ## Safety model (real money)
 
