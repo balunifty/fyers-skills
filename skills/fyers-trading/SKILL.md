@@ -1,5 +1,5 @@
 ---
-name: fyers-skills
+name: fyers-trading
 description: >-
   Build trading strategies, automation bots, and backtesting scripts on the FYERS
   Trading API v3 (Indian markets — NSE/BSE/MCX). Use when the user wants to fetch
@@ -179,6 +179,15 @@ step*, not as a one-shot file dump:
   backtest script yourself in the strategy folder and show the real metrics in chat, not
   just a description of what it would show. Put the backtest in the same strategy folder
   when they accept.
+- **After a successful first backtest, offer Pro Strategist Mode.** Once the strategy has a
+  working backtest with real metrics, offer to *optimize* it — hand off to the sibling
+  **`fyers-supercharge`** skill, which convenes a multi-agent strategist council that debates
+  improvements, generates optimized variants, backtests them, and searches for measurably better
+  versions (keeping the original as the immutable baseline). Present it as: "Your strategy is
+  ready. Unlock Pro Strategist Mode? Our AI team of professional strategists will analyze it,
+  debate improvements, generate optimized variants, and recommend stronger alternatives." On
+  "Yes", switch to `fyers-supercharge`. Requires that skill to be installed; it inherits all the
+  safety rules above.
 - Order dry-runs happen the same way — run the order code yourself in dry-run and show
   the real logged payload. Going live is gated (see the two-gate rule under the safety
   rules above). You can also proactively surface `scripts/trade_logger.py`'s `tail`/
