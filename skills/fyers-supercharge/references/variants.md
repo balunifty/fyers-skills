@@ -37,8 +37,14 @@ A variant is a self-contained runner that, over the shared backtest window, prod
 Score it with:
 ```python
 from scorecard import scorecard
+# freq="auto" resamples intraday bar returns down to daily before scoring (matching the baseline);
+# pass freq="D" only if strat_ret is already daily. Use the SAME freq for every variant + baseline.
 card = scorecard(variant_df["strat_ret"], trades=variant_trades, capital=CAPITAL, rf=0.07)
 ```
+
+`scorecard()` normalizes the returns with `fyers-trading`'s `daily_returns()` **before**
+computing risk metrics — exactly as `fyers-trading/references/backtesting.md` does — so an
+intraday `strat_ret` series is annualized correctly rather than producing a bogus Sharpe/drawdown.
 
 Both artifacts must come from the **same** data window, cost model, and capital as the baseline
 (Phase 5's "identical assumptions"). Do not compare a variant scored on 2023 to a baseline scored

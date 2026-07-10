@@ -61,16 +61,21 @@ SCORECARD_KEYS = [
 # fyers-trading reuse (with graceful fallback)
 # ---------------------------------------------------------------------------
 
-def _load_key_metrics():
-    """Return fyers-trading's `quantstats_report.key_metrics`, or None if unavailable.
+def _load_quantstats():
+    """Return fyers-trading's `(key_metrics, daily_returns)`, or `(None, None)` if unavailable.
 
     Tries a plain import first (works when the host puts both skills' scripts/ on sys.path),
     then probes for a sibling `fyers-trading/scripts` directory next to this skill and imports
-    from there. Any failure (missing skill, missing QuantStats) returns None -> stdlib fallback.
+    from there. Any failure (missing skill, missing QuantStats) returns (None, None) -> fallback.
+
+    Both functions are returned together because scoring must mirror fyers-trading's documented
+    flow: `daily_returns()` FIRST (resample intraday->daily, stamp an IST index), THEN
+    `key_metrics()` — otherwise annualized Sharpe/drawdown/CAGR on an intraday bar series are
+    wrong and the variant wouldn't be measured on the same yardstick as the baseline.
     """
     try:
-        from quantstats_report import key_metrics  # type: ignore
-        return key_metrics
+        from quantstats_report import key_metrics, daily_returns  # type: ignore
+        return key_metrics, daily_returns
     except Exception:  # noqa: BLE001 — fall through to sibling-path probe
         pass
 
@@ -87,11 +92,11 @@ def _load_key_metrics():
             if cand not in sys.path:
                 sys.path.insert(0, cand)
             try:
-                from quantstats_report import key_metrics  # type: ignore
-                return key_metrics
+                from quantstats_report import key_metrics, daily_returns  # type: ignore
+                return key_metrics, daily_returns
             except Exception:  # noqa: BLE001 — e.g. QuantStats not installed
-                return None
-    return None
+                return None, None
+    return None, None
 
 
 # ---------------------------------------------------------------------------
@@ -190,14 +195,19 @@ def _fallback_risk_metrics(returns, rf: float, ppy: int) -> dict:
     }
 
 
-def _risk_metrics(returns, rf: float, ppy: int) -> tuple[dict, bool]:
+def _risk_metrics(returns, rf: float, ppy: int, freq: str = "auto") -> tuple:
     """Risk metrics via fyers-trading's key_metrics() if possible, else stdlib fallback.
 
-    Returns (metrics_dict, used_quantstats)."""
-    key_metrics = _load_key_metrics()
-    if key_metrics is not None:
+    Mirrors fyers-trading/references/backtesting.md's flow: normalize with `daily_returns(freq)`
+    FIRST (intraday bar returns -> compounded daily, IST-indexed), THEN `key_metrics()`. Skipping
+    the normalization would annualize an intraday `strat_ret` series wrongly, so a variant would
+    be scored on a different yardstick than the baseline. Pass freq="D" when the returns are
+    already daily to skip resampling. Returns (metrics_dict, used_quantstats)."""
+    key_metrics, daily_returns = _load_quantstats()
+    if key_metrics is not None and daily_returns is not None:
         try:
-            return dict(key_metrics(returns, rf=rf)), True
+            rets = daily_returns(returns, freq=freq)   # normalize exactly like the baseline
+            return dict(key_metrics(rets, rf=rf)), True
         except Exception:  # noqa: BLE001 — bad/short series, missing dep at call time, etc.
             pass
     return _fallback_risk_metrics(returns, rf, ppy), False
@@ -294,7 +304,7 @@ def robustness_score(returns, oos_fraction: float = 0.3, rf: float = 0.0,
 
 def scorecard(returns, trades: "list[dict] | None" = None, capital: "float | None" = None,
               rf: float = 0.0, periods_per_year: int = 252, oos_fraction: float = 0.3,
-              capital_utilization: "float | None" = None,
+              freq: str = "auto", capital_utilization: "float | None" = None,
               execution_risk: "float | None" = None) -> dict:
     """Score one variant into the uniform dashboard dict (keys = SCORECARD_KEYS).
 
@@ -305,6 +315,10 @@ def scorecard(returns, trades: "list[dict] | None" = None, capital: "float | Non
         rf:      annual risk-free rate (e.g. 0.07).
         periods_per_year: annualization factor for the stdlib fallback (252 = daily).
         oos_fraction:     out-of-sample tail fraction for the robustness score.
+        freq:    normalization frequency passed to fyers-trading's `daily_returns()` before
+            scoring — "auto" (default) resamples intraday bar returns down to daily (matching the
+            baseline), "D" if the returns are already daily. Every variant and the baseline must
+            use the SAME freq so the comparison stays apples-to-apples.
         capital_utilization / execution_risk: optional caller-supplied estimates (the Execution
             and Capital-Efficiency seats provide these; they are NOT derivable from returns alone,
             so they default to None rather than being fabricated).
@@ -312,7 +326,7 @@ def scorecard(returns, trades: "list[dict] | None" = None, capital: "float | Non
     The returned dict always has every key in SCORECARD_KEYS (None where a figure isn't
     available), plus a `_meta` sub-dict noting whether fyers-trading's QuantStats was used.
     """
-    risk, used_qs = _risk_metrics(returns, rf, periods_per_year)
+    risk, used_qs = _risk_metrics(returns, rf, periods_per_year, freq=freq)
     tm = trade_metrics(trades, capital=capital)
 
     net_profit = tm.get("net_profit")
@@ -344,6 +358,7 @@ def scorecard(returns, trades: "list[dict] | None" = None, capital: "float | Non
         "scored_with_quantstats": used_qs,
         "periods_per_year": periods_per_year,
         "rf": rf,
+        "freq": freq,
     }
     return card
 

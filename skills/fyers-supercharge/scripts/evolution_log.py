@@ -8,7 +8,10 @@ never truncated or rotated, logging must never crash the caller.
 
 Unlike the trade log (which is global at ~/.fyers/trades.jsonl), the evolution log is PER
 STRATEGY and lives inside the strategy folder so it travels with the work:
-    strategies/<name>/supercharge/evolution.jsonl   (override via the `path` arg / --path)
+    strategies/<name>/supercharge/evolution.jsonl
+Build that path with ``default_path("<name>")``; pass the resulting string as the `path` arg
+(or --path on the CLI) so each strategy keeps its own log. Omitting the name falls back to a
+``_unassigned`` placeholder that stays inside the same layout rather than sharing one global log.
 
 Record types
 ------------
@@ -43,7 +46,17 @@ import json
 import os
 import sys
 
-DEFAULT_PATH = os.path.join("strategies", "supercharge", "evolution.jsonl")
+def default_path(strategy: str = "_unassigned") -> str:
+    """Build the per-strategy evolution-log path documented in references/variants.md:
+    ``strategies/<strategy>/supercharge/evolution.jsonl``. Pass the strategy name so each
+    strategy gets its own log — callers that omit it share the ``_unassigned`` fallback."""
+    return os.path.join("strategies", strategy, "supercharge", "evolution.jsonl")
+
+
+# Fallback default when no strategy name is supplied. Kept INSIDE the documented per-strategy
+# layout (strategies/<name>/supercharge/…) via a placeholder name, so it never writes outside it
+# and doesn't silently collide with a named strategy's log. Prefer default_path("<name>").
+DEFAULT_PATH = default_path()
 
 
 # ---------------------------------------------------------------------------
@@ -206,8 +219,11 @@ def checkpoint_report(round_no: int, path: str = DEFAULT_PATH) -> dict:
     for r in recs:
         rnd = r.get("round")
         if rnd not in window:
-            # still track leader from any earlier round record
-            if r.get("record_type") == "round" and r.get("leader"):
+            # Track the leader from earlier rounds only — NEVER from rounds after `round_no`,
+            # so recomputing an old checkpoint from a longer log shows the leader as of that
+            # checkpoint, not one from a later optimization round.
+            if (r.get("record_type") == "round" and r.get("leader")
+                    and isinstance(rnd, int) and rnd <= round_no):
                 leader = r["leader"]
             continue
         rt = r.get("record_type")
