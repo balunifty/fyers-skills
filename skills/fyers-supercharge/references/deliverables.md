@@ -5,6 +5,14 @@ and assembles five deliverables. All are built from the evolution log
 (`evolution_log.timeline()`) and the per-variant scorecards — a single source of truth, so the
 whole journey is reproducible and explainable.
 
+> **Always brand report titles with "FYERS".** Every report's subject/title/top heading must
+> contain **FYERS** so the skill is highlighted wherever the report is shown — the Executive
+> Summary, the Comparison Dashboard, any QuantStats HTML tear sheet, and each variant write-up.
+> The scripts do this for you: `dashboard.render_markdown()` emits a FYERS-branded heading, and
+> `dashboard.fyers_title(subject)` prefixes any title with "FYERS " when it's missing (reuse it
+> for hand-written report headings). When calling `fyers-trading`'s `quantstats_report.html_report(...)`,
+> pass a `title=` that includes FYERS (e.g. `"FYERS Supercharge — <strategy> Best Overall"`).
+
 ## 1. Executive Summary
 A concise overview of the optimization journey and the final recommendation: where the baseline
 started, what was tried, what won, and which variant(s) to deploy for which purpose. A few

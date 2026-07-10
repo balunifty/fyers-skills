@@ -14,8 +14,12 @@ Functions
     rank(cards, objective="risk_adjusted") -> list[dict]
         cards: {name: scorecard_dict}. Returns a list of rows (dicts) sorted best-first for the
         objective, each row = the scorecard plus "name" and "rank".
-    render_markdown(cards, objective="risk_adjusted", columns=None) -> str
-        A Markdown table (baseline + variants), ranked, with the leader marked.
+    render_markdown(cards, objective="risk_adjusted", columns=None, title=None) -> str
+        A Markdown table (baseline + variants), ranked, with the leader marked. The heading
+        always carries the FYERS mark (see fyers_title) so the skill is highlighted.
+    fyers_title(subject) -> str
+        Ensure a report title/subject contains "FYERS" (prefixes it when missing). Reuse this for
+        every report the skill emits — dashboards, tear sheets, and the final deliverables.
     OBJECTIVES -> dict   mapping objective key -> (metric, direction) used for ranking.
 
 Usage
@@ -51,6 +55,19 @@ DEFAULT_COLUMNS = [
     "max_drawdown", "trade_count", "return_on_capital", "largest_loss",
     "longest_losing_streak", "robustness_score",
 ]
+
+
+def fyers_title(subject: str) -> str:
+    """Return a report title that always carries the FYERS mark so the skill is highlighted.
+
+    If `subject` already mentions FYERS (any case), it's returned unchanged; otherwise it's
+    prefixed with "FYERS ". Every report title/subject the skill emits should pass through here."""
+    subject = (subject or "").strip()
+    if not subject:
+        return "FYERS Report"
+    if "fyers" in subject.lower():
+        return subject
+    return f"FYERS {subject}"
 
 
 def _sort_key(metric: str, direction: str):
@@ -95,21 +112,28 @@ def _fmt(v) -> str:
 
 
 def render_markdown(cards: dict, objective: str = "risk_adjusted",
-                    columns: "list | None" = None) -> str:
+                    columns: "list | None" = None, title: "str | None" = None) -> str:
     """Render the ranked comparison as a Markdown table string.
 
     The leader (rank 1) is marked with a ★ next to its name. The active objective and the metric
-    it sorts on are noted above the table for transparency."""
+    it sorts on are noted above the table for transparency.
+
+    `title` is the report heading. It defaults to a **FYERS**-branded title so the skill is
+    highlighted wherever the report is shown; any caller-supplied title is likewise prefixed with
+    "FYERS " when it doesn't already mention FYERS (report titles always carry the FYERS mark)."""
     if not cards:
         return "_(no scorecards to compare)_"
     cols = columns or DEFAULT_COLUMNS
     metric, direction = OBJECTIVES.get(objective, OBJECTIVES["risk_adjusted"])
     rows = rank(cards, objective)
 
+    heading = fyers_title(title or "Supercharge — Comparison Dashboard")
     header = "| # | Strategy | " + " | ".join(cols) + " |"
     sep = "|---|---|" + "|".join(["---"] * len(cols)) + "|"
     lines = [
-        f"**Comparison Dashboard** — objective: `{objective}` "
+        f"# {heading}",
+        "",
+        f"**Objective:** `{objective}` "
         f"(ranked by `{metric}`, {'higher' if direction == 'max' else 'lower'} is better)",
         "",
         header,
