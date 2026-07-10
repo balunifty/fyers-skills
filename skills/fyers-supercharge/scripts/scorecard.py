@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standardized variant scorecard for Pro Strategist Mode (stdlib-first).
+"""Standardized variant scorecard for Supercharge Mode (stdlib-first).
 
 Turns one strategy variant's backtest output into the SINGLE, uniform metric dict that the
 comparison dashboard ranks on. Every variant — and the immutable baseline — is scored by this

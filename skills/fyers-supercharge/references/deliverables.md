@@ -1,6 +1,6 @@
 # Final deliverables
 
-When the user finalizes (at a checkpoint — `checkpoints.md`), Pro Strategist Mode stops the loop
+When the user finalizes (at a checkpoint — `checkpoints.md`), Supercharge Mode stops the loop
 and assembles five deliverables. All are built from the evolution log
 (`evolution_log.timeline()`) and the per-variant scorecards — a single source of truth, so the
 whole journey is reproducible and explainable.
@@ -43,7 +43,7 @@ The orchestrator's closing summary of the council's reasoning:
 
 ## Success criteria (what "done well" means)
 
-Pro Strategist Mode succeeded when it:
+Supercharge Mode succeeded when it:
 - Produced variants **measurably better** than the original on their target metric.
 - Improved targeted metrics **without disproportionate damage** elsewhere (the dashboard makes
   trade-offs visible).

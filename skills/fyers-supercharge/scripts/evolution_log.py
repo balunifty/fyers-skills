@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Append-only evolution log for Pro Strategist Mode (stdlib only).
+"""Append-only evolution log for Supercharge Mode (stdlib only).
 
 Records the strategy's optimization journey so nothing is lost between rounds and the final
 deliverables (Strategy Evolution Timeline, Executive Summary, AI Consensus) can be assembled from

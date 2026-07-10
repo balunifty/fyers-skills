@@ -1,6 +1,6 @@
 # The optimization loop
 
-Pro Strategist Mode runs in **iterative cycles**. Each cycle (a "round") takes the current
+Supercharge Mode runs in **iterative cycles**. Each cycle (a "round") takes the current
 strategy state, runs the council through six phases, and produces backtested variants plus a
 recorded decision. The system pauses for the user every **three rounds** (`checkpoints.md`).
 

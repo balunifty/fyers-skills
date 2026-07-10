@@ -1,7 +1,7 @@
 # Variants — contract, discipline, and the Variant Library
 
 A variant is a candidate strategy derived from the baseline to pursue **one** objective. Pro
-Strategist Mode produces *many* variants, not a single "best" — the deliverable is a library of
+Supercharge Mode produces *many* variants, not a single "best" — the deliverable is a library of
 deployment-ready alternatives (below).
 
 ## The variant contract (declared before backtesting)
@@ -23,7 +23,7 @@ variant that changes ten things at once teaches nothing even if it wins.
 ## The strategy interface every variant must expose
 
 `fyers-trading` documents a per-bar returns series (`df["strat_ret"]`) as the hand-off into the
-metrics layer, but it defines **no formal runner interface** — so Pro Strategist Mode imposes a
+metrics layer, but it defines **no formal runner interface** — so Supercharge Mode imposes a
 thin one so `scorecard.py` can score every variant identically:
 
 A variant is a self-contained runner that, over the shared backtest window, produces:

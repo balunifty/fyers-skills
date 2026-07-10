@@ -1,6 +1,6 @@
 # User checkpoints — every three rounds
 
-Pro Strategist Mode **pauses after every three optimization rounds**. It never continues silently:
+Supercharge Mode **pauses after every three optimization rounds**. It never continues silently:
 the user stays in control of direction. The orchestrator assembles the report from the evolution
 log (`evolution_log.checkpoint_report(round_no)`) and presents it, then waits for the user's choice
 before starting the next three rounds.

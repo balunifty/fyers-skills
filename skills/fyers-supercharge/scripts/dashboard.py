@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Comparison dashboard for Pro Strategist Mode (stdlib only).
+"""Comparison dashboard for Supercharge Mode (stdlib only).
 
 Ranks the immutable baseline and every optimized variant on the SAME metric set (produced by
 `scorecard.py`) and renders the Comparison Dashboard table the PRD calls for. Ranking is

@@ -1,7 +1,7 @@
 ---
 name: fyers-supercharge
 description: >-
-  Pro Strategist Mode — an iterative, multi-agent optimization loop for FYERS trading
+  Supercharge Mode — an iterative, multi-agent optimization loop for FYERS trading
   strategies. Offered automatically after a strategy's first successful backtest. A central
   orchestrator convenes a council of specialist strategists (risk, return, entry, exit,
   regime, execution, options, capital efficiency, robustness, backtest integrity) that study
@@ -9,8 +9,8 @@ description: >-
   for measurably better versions across rounds — pausing for the user every three rounds. No
   single agent decides; the output is council consensus, and the original strategy is always
   preserved as the baseline. Use when the user wants to optimize, improve, harden, evolve, or
-  stress-test a strategy, or accepts the "Unlock Pro Strategist Mode?" offer. Triggers: "pro
-  strategist", "supercharge", "strategist mode", "optimize my strategy", "improve my strategy",
+  stress-test a strategy, or accepts the "Unlock Supercharge Mode?" offer. Triggers:
+  "supercharge", "supercharge mode", "optimize my strategy", "improve my strategy",
   "make my strategy better", "strategy variants", "strategy council", "evolve my strategy",
   "stress test my strategy".
 version: 0.1.0
@@ -26,7 +26,7 @@ allowed-tools:
   - WebFetch
 ---
 
-# Pro Strategist Mode — Multi-Agent Optimization Loop
+# Supercharge Mode — Multi-Agent Optimization Loop
 
 Turn a single backtested strategy into an evolving research project. A central **orchestrator**
 convenes a **council of specialist strategists** that study the strategy, debate improvements,
@@ -50,12 +50,12 @@ compared against previous versions. **No single agent decides — the output is 
 
 ## When this activates
 
-Pro Strategist Mode is offered **automatically after a strategy completes its first successful
+Supercharge Mode is offered **automatically after a strategy completes its first successful
 backtest** (the `fyers-trading` skill hands off here). Present the offer:
 
 > **Your strategy is ready.**
 >
-> **Unlock Pro Strategist Mode?**
+> **Unlock Supercharge Mode?**
 >
 > Our AI team of professional trading strategists will analyze your strategy, debate improvements,
 > generate multiple optimized variants, backtest them, and recommend stronger alternatives. The

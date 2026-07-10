@@ -14,7 +14,7 @@ Each skill is a self-contained folder under `skills/`. The install command (belo
 them all.
 
 - **`fyers-trading`** — build/backtest/order plumbing on the FYERS API v3 (the core skill).
-- **`fyers-supercharge`** — *Pro Strategist Mode*: an iterative multi-agent optimization loop
+- **`fyers-supercharge`** — *Supercharge Mode*: an iterative multi-agent optimization loop
   that debates a strategy, generates optimized variants, backtests them, and searches for
   measurably better versions across rounds (keeping the original as the baseline). Depends on
   `fyers-trading`; install both together.
@@ -50,7 +50,7 @@ skills/
       quantstats_report.py  #     QuantStats tear sheet + risk metrics from a returns series
       trade_logger.py       #     append-only JSONL audit log (~/.fyers/trades.jsonl)
       validate-skill.sh     #     lints SKILL.md before importing
-  fyers-supercharge/        # Pro Strategist Mode (iterative multi-agent optimization)
+  fyers-supercharge/        # Supercharge Mode (iterative multi-agent optimization)
     SKILL.md                #   orchestrator + council + optimization-loop instructions
     references/
       optimization-loop.md  #   the 6-phase round lifecycle + consensus rule
@@ -111,7 +111,7 @@ detects. Useful flags: `-a/--agent <agents>` to target specific agents, `-l/--li
 preview without installing, `--copy` to copy files instead of symlinking. List or remove
 later with `npx skills list` / `npx skills remove fyers-trading`.
 
-> **Pro Strategist Mode depends on the core skill.** `fyers-supercharge` calls into
+> **Supercharge Mode depends on the core skill.** `fyers-supercharge` calls into
 > `fyers-trading`'s scripts, so install both (`--all`, or pick both at the prompt).
 
 > **Requires a public repo.** `skills add` fetches over public GitHub and has no
