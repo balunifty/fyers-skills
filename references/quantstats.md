@@ -136,7 +136,7 @@ visualization**. Don't ask QuantStats to compute trade stats — it doesn't see 
 | `html_report(returns, output, benchmark=None, title=..., rf=0.0)` | **Default path** — write a full standalone HTML tear sheet to `output` and return the path. |
 | `metrics(returns, benchmark=None, mode="full", rf=0.0)` | Return QuantStats' full metrics table as a DataFrame (`mode="basic"|"full"`). |
 | `key_metrics(returns, rf=0.0)` | Small dict of headline risk metrics for chat (see below); win rate relabeled `positive_period_pct`. |
-| `plots(returns, output_dir=".", benchmark=None)` | Save individual PNG charts (snapshot, drawdown, monthly heatmap); returns the file paths. |
+| `plots(returns, output_dir=".", benchmark=None)` | Save individual PNG charts (snapshot, drawdown, monthly heatmap); returns the file paths. With `benchmark=`, also writes `returns.png` (cumulative strategy vs benchmark) and `active_heatmap.png` (monthly active returns). `snapshot`/`drawdown` have no benchmark parameter and stay strategy-only. |
 
 Inputs are validated with plain `ValueError`s (empty series, all-NaN, too few points for
 annualization) instead of a cryptic library error.

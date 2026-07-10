@@ -179,10 +179,16 @@ def _check_points(s: pd.Series, minimum: int = 2) -> None:
 
 
 def _clean_benchmark(benchmark) -> "pd.Series | None":
-    """Coerce an optional benchmark into a daily IST returns Series (or None)."""
+    """Coerce an optional benchmark into a daily IST returns Series (or None).
+
+    Uses the same ``freq="auto"`` resampling the strategy path uses, so an INTRADAY
+    benchmark is compounded down to daily exactly like the strategy returns were — a
+    benchmark left at bar frequency would annualize wrong and misalign against a strategy
+    aggregated with ``daily_returns(..., freq="auto")``. An already-daily benchmark passes
+    through unchanged (daily resampling is idempotent on it)."""
     if benchmark is None:
         return None
-    b = daily_returns(benchmark, freq="D")   # benchmark is expected already-daily
+    b = daily_returns(benchmark)   # freq="auto": resample intraday -> daily like the strategy
     b.name = "benchmark"
     return b
 
@@ -261,6 +267,12 @@ def plots(returns, output_dir: str = ".", benchmark=None) -> list[str]:
 
     Returns the list of written file paths. Use `html_report()` for the full tear sheet;
     this is for embedding specific charts. Uses the headless Agg backend.
+
+    When `benchmark` (a daily returns Series pulled via `scripts/fyers_client.py history()`,
+    e.g. NSE:NIFTY50-INDEX — see references/quantstats.md) is given, two extra comparison
+    charts are added: `returns.png` (cumulative strategy vs benchmark) and
+    `active_heatmap.png` (monthly *active* returns, strategy − benchmark). QuantStats'
+    `snapshot`/`drawdown` plots have no benchmark parameter, so those stay strategy-only.
     """
     import os
 
@@ -269,6 +281,7 @@ def plots(returns, output_dir: str = ".", benchmark=None) -> list[str]:
     r = _to_series(returns)
     r = _ensure_ist_index(r).dropna()
     _check_points(r)
+    bench = _clean_benchmark(benchmark)
     os.makedirs(output_dir, exist_ok=True)
 
     paths: list[str] = []
@@ -283,6 +296,19 @@ def plots(returns, output_dir: str = ".", benchmark=None) -> list[str]:
     heat = os.path.join(output_dir, "monthly_heatmap.png")
     qs.plots.monthly_heatmap(r, savefig=heat, show=False)
     paths.append(heat)
+
+    if bench is not None:
+        # Cumulative strategy-vs-benchmark comparison.
+        cmp = os.path.join(output_dir, "returns.png")
+        qs.plots.returns(r, benchmark=bench, savefig=cmp, show=False)
+        paths.append(cmp)
+
+        # Monthly ACTIVE returns (strategy − benchmark); active=True is what makes
+        # monthly_heatmap actually consume the benchmark.
+        active_heat = os.path.join(output_dir, "active_heatmap.png")
+        qs.plots.monthly_heatmap(r, benchmark=bench, active=True,
+                                 savefig=active_heat, show=False)
+        paths.append(active_heat)
 
     return paths
 
