@@ -173,12 +173,22 @@ step*, not as a one-shot file dump:
   (data → signal → risk checks → order → logging) and save it in the folder (e.g.
   `flow.mmd` or embedded in the folder's `README.md`) so the user can review the logic
   at a glance. Show the diagram to the user.
-- **Always offer to build a backtest** once the original strategy is functional against
-  real data — tell the user you can backtest it against FYERS historical candles
-  (`references/backtesting.md`, `scripts/example_strategy.py`), and on acceptance, run the
-  backtest script yourself in the strategy folder and show the real metrics in chat, not
-  just a description of what it would show. Put the backtest in the same strategy folder
-  when they accept.
+- **Automatically backtest once the strategy is functional — don't wait to be asked.** As
+  soon as the original strategy runs against real data, build and run a backtest yourself
+  against FYERS historical candles (`references/backtesting.md`, `scripts/example_strategy.py`),
+  in the strategy folder, and show the real metrics in chat (not a description of what it
+  would show). This is the default flow, not an offer — proceed without a prompt. (Only skip
+  if the user explicitly opted out of the agent running code, per "Default mode: conversational
+  execution".) Put the backtest in the same strategy folder.
+- **Then automatically generate a QuantStats tear sheet — also without being asked.** Right
+  after the backtest produces a returns series (`df["strat_ret"]`), run
+  `scripts/quantstats_report.py` on it (`html_report()` for the full HTML tear sheet, plus
+  `key_metrics()` for the headline numbers in chat) so the user sees a professional view of
+  their algo's performance — Sharpe/Sortino/drawdown/CAGR and the monthly-returns heatmap. Save
+  the tear sheet in the strategy folder (e.g. `report.html`) and tell the user its path and the
+  key metrics. Requires QuantStats installed (`references/quantstats.md`); if it isn't, say so
+  and still report the backtest's own metrics. Mind the intraday→daily and "two win rates"
+  gotchas documented in `references/quantstats.md`.
 - **After a successful first backtest, offer Supercharge Mode.** Once the strategy has a
   working backtest with real metrics, offer to *optimize* it — hand off to the sibling
   **`fyers-supercharge`** skill, which convenes a multi-agent strategist council that debates

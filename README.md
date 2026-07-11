@@ -80,7 +80,10 @@ assets/                     # fixtures / images
    runs the login flow and verifies it against `/profile` — see `references/auth.md`. It
    then builds the strategy incrementally, running each piece for real and showing you
    the output as it goes (see `SKILL.md`'s "Default mode: conversational execution").
-   If you'd rather just get code without the agent running anything, say so explicitly.
+   Once the strategy runs, it **automatically backtests it and generates a QuantStats tear
+   sheet** (Sharpe/Sortino/drawdown + monthly heatmap) without you having to ask, then offers
+   Supercharge Mode. If you'd rather just get code without the agent running anything, say so
+   explicitly.
 4. Prefer to do it yourself instead? `cp skills/fyers-trading/.env.example .env`, fill in
    the values, run `python skills/fyers-trading/scripts/fyers_login.py` (caches the daily
    token), then verify with `python skills/fyers-trading/scripts/fyers_client.py profile`.
