@@ -1,0 +1,2 @@
+# One FYERS underlying symbol per line. Lines beginning with # are ignored.
+NSE:SBIN-EQ

@@ -1,0 +1,9 @@
+2026-09-14T10:03:30 STARTED: sample order script
+2026-09-14T10:03:31 MARKET_PRICE: NSE:SBIN-EQ - ltp=995.7
+2026-09-14T10:03:31 LIVE BUY: NSE:SBIN-EQ, quantity=1, ltp=995.7, limit=995.7
+2026-09-14T10:03:31 ORDER_REQUEST: {"limitPrice": 995.7, "offlineOrder": false, "orderTag": "sampletest", "productType": "INTRADAY", "qty": 1, "side": 1, "stopPrice": 0, "symbol": "NSE:SBIN-EQ", "type": 1, "validity": "DAY"}
+2026-09-14T10:03:34 REJECTED: NSE:SBIN-EQ - code=-99 - RED:Block Type:NonSqroff Reason:Block set due to mtom breach(127.073160)[ FAK44385 NSE I ]
+2026-09-14T10:06:29 DRY-RUN: NSE:SBIN-EQ - no order sent
+2026-09-14T10:06:29 PLACED: NSE:SBIN-EQ - order_id=OID123 - submitted
+2026-09-14T10:08:38 DRY-RUN: NSE:SBIN-EQ - no order sent
+2026-09-14T10:08:38 PLACED: NSE:SBIN-EQ - order_id=OID123 - submitted

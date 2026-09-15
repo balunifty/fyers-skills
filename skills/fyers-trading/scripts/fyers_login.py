@@ -32,6 +32,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import webbrowser
 from pathlib import Path
 
 API_BASE = "https://api-t1.fyers.in/api/v3"
@@ -45,6 +46,24 @@ USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 )
+
+
+def _load_dotenv() -> None:
+    """Load simple KEY=value entries without replacing existing environment values."""
+    env_path = Path(__file__).resolve().parents[3] / ".env"
+    if not env_path.exists():
+        return
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key, value = key.strip(), value.strip().strip("\"'")
+        if key and not os.environ.get(key):
+            os.environ[key] = value
+
+
+_load_dotenv()
 
 
 def _env(name: str) -> str:
@@ -154,6 +173,10 @@ def interactive_login() -> dict:
     url = generate_authcode_url(app_id, redirect_uri)
     print("\n1) Open this URL in your browser and log in to FYERS:\n")
     print("   " + url + "\n")
+    if webbrowser.open(url, new=2):
+        print("The authorization page was opened in your default browser.")
+    else:
+        print("Could not open the browser automatically; copy the URL above manually.")
     print("2) After login you'll be redirected to your redirect_uri with ?auth_code=...")
     pasted = input("3) Paste the auth_code (or the full redirected URL) here:\n> ")
     auth_code = extract_auth_code(pasted)

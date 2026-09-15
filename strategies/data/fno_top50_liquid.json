@@ -1,0 +1,402 @@
+[
+  {
+    "symbol": "IDEA",
+    "total_oi": 2955134120,
+    "total_volume": 2840559450,
+    "strikes_with_oi": 12,
+    "avg_bid_ask_spread": 0.26,
+    "liquidity_score": 2034251680.57
+  },
+  {
+    "symbol": "YESBANK",
+    "total_oi": 659880100,
+    "total_volume": 2130132300,
+    "strikes_with_oi": 11,
+    "avg_bid_ask_spread": 0.45,
+    "liquidity_score": 903013701.79
+  },
+  {
+    "symbol": "HDFCBANK",
+    "total_oi": 247918500,
+    "total_volume": 579129850,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.05,
+    "liquidity_score": 272932071.98
+  },
+  {
+    "symbol": "SUZLON",
+    "total_oi": 252895100,
+    "total_volume": 179641500,
+    "strikes_with_oi": 17,
+    "avg_bid_ask_spread": 2.0,
+    "liquidity_score": 155069971.73
+  },
+  {
+    "symbol": "ONGC",
+    "total_oi": 85965700,
+    "total_volume": 336935250,
+    "strikes_with_oi": 20,
+    "avg_bid_ask_spread": 0.96,
+    "liquidity_score": 135492012.17
+  },
+  {
+    "symbol": "TATASTEEL",
+    "total_oi": 175582000,
+    "total_volume": 171996000,
+    "strikes_with_oi": 20,
+    "avg_bid_ask_spread": 0.55,
+    "liquidity_score": 121860592.81
+  },
+  {
+    "symbol": "IDFCFIRSTB",
+    "total_oi": 220373940,
+    "total_volume": 108582425,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 0.83,
+    "liquidity_score": 120751260.95
+  },
+  {
+    "symbol": "JIOFIN",
+    "total_oi": 130826950,
+    "total_volume": 157769600,
+    "strikes_with_oi": 20,
+    "avg_bid_ask_spread": 0.88,
+    "liquidity_score": 99687261.49
+  },
+  {
+    "symbol": "ASHOKLEY",
+    "total_oi": 117440000,
+    "total_volume": 155480000,
+    "strikes_with_oi": 19,
+    "avg_bid_ask_spread": 0.52,
+    "liquidity_score": 93648357.61
+  },
+  {
+    "symbol": "PNB",
+    "total_oi": 109112000,
+    "total_volume": 153280000,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 0.35,
+    "liquidity_score": 89663552.46
+  },
+  {
+    "symbol": "CANBK",
+    "total_oi": 155182500,
+    "total_volume": 73156500,
+    "strikes_with_oi": 17,
+    "avg_bid_ask_spread": 0.49,
+    "liquidity_score": 84046879.91
+  },
+  {
+    "symbol": "RELIANCE",
+    "total_oi": 106495000,
+    "total_volume": 127595000,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 0.91,
+    "liquidity_score": 80902944.65
+  },
+  {
+    "symbol": "ITC",
+    "total_oi": 127905285,
+    "total_volume": 96924300,
+    "strikes_with_oi": 19,
+    "avg_bid_ask_spread": 0.63,
+    "liquidity_score": 80266176.02
+  },
+  {
+    "symbol": "KOTAKBANK",
+    "total_oi": 103626000,
+    "total_volume": 119126000,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.32,
+    "liquidity_score": 77212958.73
+  },
+  {
+    "symbol": "WIPRO",
+    "total_oi": 125124000,
+    "total_volume": 77223000,
+    "strikes_with_oi": 18,
+    "avg_bid_ask_spread": 0.7,
+    "liquidity_score": 73241544.86
+  },
+  {
+    "symbol": "ETERNAL",
+    "total_oi": 88442250,
+    "total_volume": 124761400,
+    "strikes_with_oi": 19,
+    "avg_bid_ask_spread": 0.85,
+    "liquidity_score": 72830151.8
+  },
+  {
+    "symbol": "SBIN",
+    "total_oi": 89686500,
+    "total_volume": 99897000,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.41,
+    "liquidity_score": 65868225.26
+  },
+  {
+    "symbol": "ADANIPOWER",
+    "total_oi": 100227150,
+    "total_volume": 81174300,
+    "strikes_with_oi": 17,
+    "avg_bid_ask_spread": 0.48,
+    "liquidity_score": 64470316.36
+  },
+  {
+    "symbol": "TMPV",
+    "total_oi": 74516800,
+    "total_volume": 88651200,
+    "strikes_with_oi": 20,
+    "avg_bid_ask_spread": 0.87,
+    "liquidity_score": 56427761.82
+  },
+  {
+    "symbol": "NMDC",
+    "total_oi": 100163250,
+    "total_volume": 50706000,
+    "strikes_with_oi": 20,
+    "avg_bid_ask_spread": 0.91,
+    "liquidity_score": 55302557.03
+  },
+  {
+    "symbol": "UNIONBANK",
+    "total_oi": 83482035,
+    "total_volume": 70804425,
+    "strikes_with_oi": 19,
+    "avg_bid_ask_spread": 0.57,
+    "liquidity_score": 54661762.19
+  },
+  {
+    "symbol": "SAGILITY",
+    "total_oi": 80088000,
+    "total_volume": 74664000,
+    "strikes_with_oi": 16,
+    "avg_bid_ask_spread": 0.22,
+    "liquidity_score": 54472354.67
+  },
+  {
+    "symbol": "BANKBARODA",
+    "total_oi": 89741925,
+    "total_volume": 54141750,
+    "strikes_with_oi": 18,
+    "avg_bid_ask_spread": 1.09,
+    "liquidity_score": 52161851.35
+  },
+  {
+    "symbol": "INDUSTOWER",
+    "total_oi": 27043600,
+    "total_volume": 137349800,
+    "strikes_with_oi": 22,
+    "avg_bid_ask_spread": 1.41,
+    "liquidity_score": 52047893.47
+  },
+  {
+    "symbol": "COALINDIA",
+    "total_oi": 66825000,
+    "total_volume": 73125450,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.31,
+    "liquidity_score": 48692410.62
+  },
+  {
+    "symbol": "BIOCON",
+    "total_oi": 43415000,
+    "total_volume": 102322500,
+    "strikes_with_oi": 20,
+    "avg_bid_ask_spread": 1.6,
+    "liquidity_score": 48085858.0
+  },
+  {
+    "symbol": "VEDL",
+    "total_oi": 56174050,
+    "total_volume": 83040350,
+    "strikes_with_oi": 19,
+    "avg_bid_ask_spread": 0.43,
+    "liquidity_score": 47412014.36
+  },
+  {
+    "symbol": "PAYTM",
+    "total_oi": 24563720,
+    "total_volume": 123264500,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 3.63,
+    "liquidity_score": 46827213.07
+  },
+  {
+    "symbol": "NATIONALUM",
+    "total_oi": 46794385,
+    "total_volume": 86405625,
+    "strikes_with_oi": 18,
+    "avg_bid_ask_spread": 0.92,
+    "liquidity_score": 44662821.06
+  },
+  {
+    "symbol": "INFY",
+    "total_oi": 59060000,
+    "total_volume": 68073600,
+    "strikes_with_oi": 19,
+    "avg_bid_ask_spread": 1.93,
+    "liquidity_score": 44067651.74
+  },
+  {
+    "symbol": "BHEL",
+    "total_oi": 50426240,
+    "total_volume": 79214625,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.0,
+    "liquidity_score": 43960828.17
+  },
+  {
+    "symbol": "GMRAIRPORT",
+    "total_oi": 90479700,
+    "total_volume": 23491800,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.08,
+    "liquidity_score": 43265009.16
+  },
+  {
+    "symbol": "IRFC",
+    "total_oi": 86208715,
+    "total_volume": 29115975,
+    "strikes_with_oi": 20,
+    "avg_bid_ask_spread": 0.79,
+    "liquidity_score": 43244535.95
+  },
+  {
+    "symbol": "IOC",
+    "total_oi": 66953300,
+    "total_volume": 53634750,
+    "strikes_with_oi": 18,
+    "avg_bid_ask_spread": 0.74,
+    "liquidity_score": 42896371.28
+  },
+  {
+    "symbol": "ICICIBANK",
+    "total_oi": 46532500,
+    "total_volume": 75840100,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.54,
+    "liquidity_score": 41389264.75
+  },
+  {
+    "symbol": "BEL",
+    "total_oi": 71386815,
+    "total_volume": 41866500,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.29,
+    "liquidity_score": 41139531.33
+  },
+  {
+    "symbol": "HINDZINC",
+    "total_oi": 41166120,
+    "total_volume": 81645025,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.4,
+    "liquidity_score": 40984514.22
+  },
+  {
+    "symbol": "MOTHERSON",
+    "total_oi": 66413850,
+    "total_volume": 45823650,
+    "strikes_with_oi": 19,
+    "avg_bid_ask_spread": 0.78,
+    "liquidity_score": 40337926.39
+  },
+  {
+    "symbol": "POWERGRID",
+    "total_oi": 51047300,
+    "total_volume": 62901400,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.05,
+    "liquidity_score": 39315046.41
+  },
+  {
+    "symbol": "SWIGGY",
+    "total_oi": 64521055,
+    "total_volume": 44179600,
+    "strikes_with_oi": 20,
+    "avg_bid_ask_spread": 1.4,
+    "liquidity_score": 39085848.1
+  },
+  {
+    "symbol": "NHPC",
+    "total_oi": 62014850,
+    "total_volume": 45307050,
+    "strikes_with_oi": 20,
+    "avg_bid_ask_spread": 2.13,
+    "liquidity_score": 38420392.23
+  },
+  {
+    "symbol": "ANGELONE",
+    "total_oi": 40732500,
+    "total_volume": 64587500,
+    "strikes_with_oi": 19,
+    "avg_bid_ask_spread": 0.87,
+    "liquidity_score": 35693959.13
+  },
+  {
+    "symbol": "BANKINDIA",
+    "total_oi": 63117600,
+    "total_volume": 27684800,
+    "strikes_with_oi": 16,
+    "avg_bid_ask_spread": 0.93,
+    "liquidity_score": 33573789.18
+  },
+  {
+    "symbol": "IREDA",
+    "total_oi": 69241625,
+    "total_volume": 18493675,
+    "strikes_with_oi": 16,
+    "avg_bid_ask_spread": 0.82,
+    "liquidity_score": 33266798.02
+  },
+  {
+    "symbol": "IEX",
+    "total_oi": 54240150,
+    "total_volume": 38458350,
+    "strikes_with_oi": 15,
+    "avg_bid_ask_spread": 0.52,
+    "liquidity_score": 33257960.18
+  },
+  {
+    "symbol": "NBCC",
+    "total_oi": 54775500,
+    "total_volume": 32084000,
+    "strikes_with_oi": 15,
+    "avg_bid_ask_spread": 0.78,
+    "liquidity_score": 31556691.95
+  },
+  {
+    "symbol": "TATAPOWER",
+    "total_oi": 56606550,
+    "total_volume": 21312100,
+    "strikes_with_oi": 21,
+    "avg_bid_ask_spread": 1.3,
+    "liquidity_score": 29061080.72
+  },
+  {
+    "symbol": "NTPC",
+    "total_oi": 50520000,
+    "total_volume": 28503000,
+    "strikes_with_oi": 20,
+    "avg_bid_ask_spread": 1.31,
+    "liquidity_score": 28782687.14
+  },
+  {
+    "symbol": "KALYANKJIL",
+    "total_oi": 35307900,
+    "total_volume": 47969550,
+    "strikes_with_oi": 23,
+    "avg_bid_ask_spread": 0.92,
+    "liquidity_score": 28542379.41
+  },
+  {
+    "symbol": "RVNL",
+    "total_oi": 49485965,
+    "total_volume": 21533050,
+    "strikes_with_oi": 17,
+    "avg_bid_ask_spread": 1.15,
+    "liquidity_score": 26275592.85
+  }
+]

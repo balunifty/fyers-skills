@@ -1,0 +1,256 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-09-14",
+  "strategies": [
+    {
+      "id": "STRAT_001",
+      "name": "ORB Breakout",
+      "type": "BREAKOUT",
+      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY", "STOCKS"],
+      "timeframe": "5min",
+      "entry_rules": {
+        "CE": {
+          "condition": "5min candle close > ORB High",
+          "description": "Buy Call when price breaks above opening range"
+        },
+        "PE": {
+          "condition": "5min candle close < ORB Low",
+          "description": "Buy Put when price breaks below opening range"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "min_volume": 100000,
+        "orb_time": "09:15-09:30",
+        "max_positions": 1
+      },
+      "confidence": 0.75
+    },
+    {
+      "id": "STRAT_002",
+      "name": "ORB Rejection",
+      "type": "REVERSAL",
+      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY", "STOCKS"],
+      "timeframe": "15min",
+      "entry_rules": {
+        "PE": {
+          "condition": "15min candle high >= ORB High AND close < ORB High",
+          "description": "Bearish rejection at ORB High"
+        },
+        "CE": {
+          "condition": "15min candle low <= ORB Low AND close > ORB Low",
+          "description": "Bullish rejection at ORB Low"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "min_volume": 100000,
+        "confirmation_candles": 1
+      },
+      "confidence": 0.70
+    },
+    {
+      "id": "STRAT_003",
+      "name": "Double Top Rejection",
+      "type": "REVERSAL",
+      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY", "STOCKS"],
+      "timeframe": "15min",
+      "entry_rules": {
+        "PE": {
+          "condition": "15min close < HMA(21) AND high >= intraday_high AND close < intraday_high AND RSI trending down",
+          "description": "Double top rejection at intraday high"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "min_candles": 5,
+        "hma_period": 21
+      },
+      "confidence": 0.65
+    },
+    {
+      "id": "STRAT_004",
+      "name": "Double Bottom Rejection",
+      "type": "REVERSAL",
+      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY", "STOCKS"],
+      "timeframe": "15min",
+      "entry_rules": {
+        "CE": {
+          "condition": "15min close > HMA(21) AND low <= intraday_low AND close > intraday_low AND RSI trending up",
+          "description": "Double bottom rejection at intraday low"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "min_candles": 5,
+        "hma_period": 21
+      },
+      "confidence": 0.65
+    },
+    {
+      "id": "STRAT_005",
+      "name": "EMA Crossover with RSI",
+      "type": "TREND_FOLLOWING",
+      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY", "STOCKS"],
+      "timeframe": "15min",
+      "entry_rules": {
+        "CE": {
+          "condition": "9 EMA crosses above 26 EMA AND close > 9 EMA AND RSI > 55",
+          "description": "Bullish EMA crossover with RSI confirmation"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "ema_fast": 9,
+        "ema_slow": 26,
+        "rsi_period": 14,
+        "rsi_threshold": 55
+      },
+      "confidence": 0.72
+    },
+    {
+      "id": "STRAT_006",
+      "name": "Index Rejection - NIFTY/SENSEX",
+      "type": "REVERSAL",
+      "instruments": ["NIFTY", "SENSEX"],
+      "timeframe": "15min",
+      "entry_rules": {
+        "PE": {
+          "condition": "high >= 26 EMA AND close < 26 EMA AND 9 EMA < 26 EMA AND RSI <= 50",
+          "description": "Bearish rejection at 26 EMA"
+        },
+        "CE": {
+          "condition": "low <= 9 EMA AND close > 26 EMA AND RSI > 50",
+          "description": "Bullish rejection at 9 EMA"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_points": 15,
+        "auto_close_time": "15:10"
+      },
+      "filters": {
+        "rejection_ema": 26,
+        "support_ema": 9,
+        "rsi_period": 14
+      },
+      "confidence": 0.75
+    },
+    {
+      "id": "STRAT_007",
+      "name": "Index Rejection - BANKNIFTY",
+      "type": "REVERSAL",
+      "instruments": ["BANKNIFTY"],
+      "timeframe": "15min",
+      "entry_rules": {
+        "PE": {
+          "condition": "high >= 35 EMA AND close < 35 EMA AND 9 EMA < 35 EMA AND RSI <= 50",
+          "description": "Bearish rejection at 35 EMA"
+        },
+        "CE": {
+          "condition": "low <= 9 EMA AND close > 35 EMA AND RSI > 50",
+          "description": "Bullish rejection at 9 EMA"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_points": 15,
+        "auto_close_time": "15:10"
+      },
+      "filters": {
+        "rejection_ema": 35,
+        "support_ema": 9,
+        "rsi_period": 14
+      },
+      "confidence": 0.75
+    },
+    {
+      "id": "STRAT_008",
+      "name": "EMA 10/20/30 Crossover",
+      "type": "TREND_FOLLOWING",
+      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY"],
+      "timeframe": "5min",
+      "entry_rules": {
+        "CE": {
+          "condition": "EMA10 > EMA20 > EMA30 AND RSI > 55",
+          "description": "Triple EMA bullish alignment"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "ema_periods": [10, 20, 30],
+        "rsi_period": 14,
+        "rsi_threshold": 55
+      },
+      "confidence": 0.70
+    },
+    {
+      "id": "STRAT_009",
+      "name": "EMA 10/50 Crossover",
+      "type": "TREND_FOLLOWING",
+      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY"],
+      "timeframe": "5min",
+      "entry_rules": {
+        "CE": {
+          "condition": "EMA10 crosses above EMA50 AND RSI > 55",
+          "description": "Golden cross on 5min"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "ema_fast": 10,
+        "ema_slow": 50,
+        "rsi_period": 14,
+        "rsi_threshold": 55
+      },
+      "confidence": 0.68
+    }
+  ],
+  "risk_management": {
+    "max_position_size_percent": 2,
+    "max_daily_loss_percent": 5,
+    "max_open_positions": 3,
+    "stop_loss_type": "fixed_percent",
+    "default_stop_loss": 15,
+    "market_hours": {
+      "start": "09:15",
+      "end": "15:15",
+      "timezone": "Asia/Kolkata"
+    },
+    "auto_close_before_market": 5
+  },
+  "instruments": {
+    "indices": {
+      "NIFTY": {"symbol": "NSE:NIFTY50-INDEX", "lot_size": 50, "strike_step": 50},
+      "SENSEX": {"symbol": "BSE:SENSEX-INDEX", "lot_size": 15, "strike_step": 100},
+      "BANKNIFTY": {"symbol": "NSE:NIFTYBANK-INDEX", "lot_size": 15, "strike_step": 100}
+    },
+    "stock_list_file": "NiftyFNOTop100.txt"
+  }
+}

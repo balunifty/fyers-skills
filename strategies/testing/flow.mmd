@@ -1,0 +1,13 @@
+flowchart TD
+    A[Read stocks.txt] --> B[Fetch 5-minute history]
+    B --> C[Drop partial candle]
+    C --> D[Calculate EMA 10, 20, 30 and RSI 14]
+    D --> E{All six entry conditions?}
+    E -- No --> F[Report HOLD]
+    E -- Yes --> G[Fetch nearest-expiry option chain]
+    G --> H[Select ATM CE returned by FYERS]
+    H --> I[Build market order]
+    I --> J{--live and typed symbol confirmation?}
+    J -- No --> K[Dry-run and log payload]
+    J -- Yes --> L[Validate symbol and lot size]
+    L --> M[Submit order]

@@ -1,0 +1,3196 @@
+[
+  {
+    "underlying": "360ONE",
+    "name": "360ONE 1500 CE",
+    "lot_size": 500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:360ONE26NOV1680PE",
+    "fy_token": "101126112366589"
+  },
+  {
+    "underlying": "ABB",
+    "name": "ABB 4400 CE",
+    "lot_size": 125,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ABB26NOV11200PE",
+    "fy_token": "101126112366916"
+  },
+  {
+    "underlying": "ABCAPITAL",
+    "name": "ABCAPITAL 505 CE",
+    "lot_size": 3100,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ABCAPITAL26NOV600PE",
+    "fy_token": "101126112367321"
+  },
+  {
+    "underlying": "ADANIENSOL",
+    "name": "ADANIENSOL 920 CE",
+    "lot_size": 675,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ADANIENSOL26NOV2320PE",
+    "fy_token": "101126112367642"
+  },
+  {
+    "underlying": "ADANIENT",
+    "name": "ADANIENT 3950 CE",
+    "lot_size": 309,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ADANIENT26NOV4400PE",
+    "fy_token": "101126112367942"
+  },
+  {
+    "underlying": "ADANIGREEN",
+    "name": "ADANIGREEN 940 CE",
+    "lot_size": 600,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ADANIGREEN26NOV2000PE",
+    "fy_token": "101126112368184"
+  },
+  {
+    "underlying": "ADANIPORTS",
+    "name": "ADANIPORTS 2440 CE",
+    "lot_size": 475,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ADANIPORTS26NOV2400PE",
+    "fy_token": "101126112368659"
+  },
+  {
+    "underlying": "ADANIPOWER",
+    "name": "ADANIPOWER 275 CE",
+    "lot_size": 3550,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ADANIPOWER26NOV320PE",
+    "fy_token": "101126112368835"
+  },
+  {
+    "underlying": "ALKEM",
+    "name": "ALKEM 2900 CE",
+    "lot_size": 125,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ALKEM26NOV7800PE",
+    "fy_token": "101126112369226"
+  },
+  {
+    "underlying": "AMBER",
+    "name": "AMBER 5000 CE",
+    "lot_size": 100,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:AMBER26NOV11200PE",
+    "fy_token": "101126112369469"
+  },
+  {
+    "underlying": "AMBUJACEM",
+    "name": "AMBUJACEM 250 CE",
+    "lot_size": 1200,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:AMBUJACEM26NOV600PE",
+    "fy_token": "101126112369958"
+  },
+  {
+    "underlying": "ANGELONE",
+    "name": "ANGELONE 195 CE",
+    "lot_size": 2500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ANGELONE26NOV480PE",
+    "fy_token": "101126112370371"
+  },
+  {
+    "underlying": "APLAPOLLO",
+    "name": "APLAPOLLO 2700 CE",
+    "lot_size": 350,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:APLAPOLLO26NOV2880PE",
+    "fy_token": "101126112370723"
+  },
+  {
+    "underlying": "APOLLOHOSP",
+    "name": "APOLLOHOSP 5200 CE",
+    "lot_size": 125,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:APOLLOHOSP26NOV12400PE",
+    "fy_token": "101126112371007"
+  },
+  {
+    "underlying": "ASHOKLEY",
+    "name": "ASHOKLEY 100 CE",
+    "lot_size": 5000,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ASHOKLEY26NOV230PE",
+    "fy_token": "101126112371173"
+  },
+  {
+    "underlying": "ASIANPAINT",
+    "name": "ASIANPAINT 3400 CE",
+    "lot_size": 250,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ASIANPAINT26NOV3840PE",
+    "fy_token": "101126112371682"
+  },
+  {
+    "underlying": "ASTRAL",
+    "name": "ASTRAL 2020 CE",
+    "lot_size": 425,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ASTRAL26NOV2240PE",
+    "fy_token": "101126112372105"
+  },
+  {
+    "underlying": "ATHERENERG",
+    "name": "ATHERENERG 1900 CE",
+    "lot_size": 375,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ATHERENERG26NOV2160PE",
+    "fy_token": "101126112373150"
+  },
+  {
+    "underlying": "AUBANK",
+    "name": "AUBANK 600 CE",
+    "lot_size": 1000,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:AUBANK26NOV1600PE",
+    "fy_token": "101126112373535"
+  },
+  {
+    "underlying": "AUROPHARMA",
+    "name": "AUROPHARMA 1980 CE",
+    "lot_size": 550,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:AUROPHARMA26NOV2320PE",
+    "fy_token": "101126112373949"
+  },
+  {
+    "underlying": "AXISBANK",
+    "name": "AXISBANK 1660 CE",
+    "lot_size": 625,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:AXISBANK26NOV1920PE",
+    "fy_token": "101126112374258"
+  },
+  {
+    "underlying": "BAJAJ-AUTO",
+    "name": "BAJAJ-AUTO 14800 CE",
+    "lot_size": 75,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BAJAJ-AUTO26NOV16400PE",
+    "fy_token": "101126112374984"
+  },
+  {
+    "underlying": "BAJAJFINSV",
+    "name": "BAJAJFINSV 2560 CE",
+    "lot_size": 300,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BAJAJFINSV26NOV2720PE",
+    "fy_token": "101126112375683"
+  },
+  {
+    "underlying": "BAJAJHLDNG",
+    "name": "BAJAJHLDNG 13800 CE",
+    "lot_size": 75,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BAJAJHLDNG26OCT15800PE",
+    "fy_token": "101126102776109"
+  },
+  {
+    "underlying": "BAJFINANCE",
+    "name": "BAJFINANCE 810 CE",
+    "lot_size": 750,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BAJFINANCE26NOV1560PE",
+    "fy_token": "101126112376659"
+  },
+  {
+    "underlying": "BANDHANBNK",
+    "name": "BANDHANBNK 235 CE",
+    "lot_size": 3600,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BANDHANBNK26NOV300PE",
+    "fy_token": "101126112376866"
+  },
+  {
+    "underlying": "BANKBARODA",
+    "name": "BANKBARODA 335 CE",
+    "lot_size": 2925,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BANKBARODA26NOV360PE",
+    "fy_token": "101126112376993"
+  },
+  {
+    "underlying": "BANKINDIA",
+    "name": "BANKINDIA 80 CE",
+    "lot_size": 5200,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BANKINDIA26NOV200PE",
+    "fy_token": "101126112377425"
+  },
+  {
+    "underlying": "BDL",
+    "name": "BDL 980 CE",
+    "lot_size": 425,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BDL26NOV1840PE",
+    "fy_token": "101126112377976"
+  },
+  {
+    "underlying": "BEL",
+    "name": "BEL 535 CE",
+    "lot_size": 1425,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BEL26NOV580PE",
+    "fy_token": "101126112378550"
+  },
+  {
+    "underlying": "BHARATFORG",
+    "name": "BHARATFORG 1040 CE",
+    "lot_size": 500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BHARATFORG26NOV2960PE",
+    "fy_token": "101126112378987"
+  },
+  {
+    "underlying": "BHARTIARTL",
+    "name": "BHARTIARTL 1040 CE",
+    "lot_size": 475,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BHARTIARTL26NOV2640PE",
+    "fy_token": "101126112379330"
+  },
+  {
+    "underlying": "BHEL",
+    "name": "BHEL 545 CE",
+    "lot_size": 2625,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BHEL26NOV600PE",
+    "fy_token": "101126112379815"
+  },
+  {
+    "underlying": "BIOCON",
+    "name": "BIOCON 305 CE",
+    "lot_size": 2500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BIOCON26NOV600PE",
+    "fy_token": "101126112380211"
+  },
+  {
+    "underlying": "BLUESTARCO",
+    "name": "BLUESTARCO 1980 CE",
+    "lot_size": 325,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BLUESTARCO26NOV2240PE",
+    "fy_token": "101126112380613"
+  },
+  {
+    "underlying": "BOSCHLTD",
+    "name": "BOSCHLTD 53000 CE",
+    "lot_size": 25,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BOSCHLTD26NOV66000PE",
+    "fy_token": "101126112381000"
+  },
+  {
+    "underlying": "BPCL",
+    "name": "BPCL 440 CE",
+    "lot_size": 1975,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BPCL26NOV440PE",
+    "fy_token": "101126112381532"
+  },
+  {
+    "underlying": "BRITANNIA",
+    "name": "BRITANNIA 6700 CE",
+    "lot_size": 125,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BRITANNIA26NOV7800PE",
+    "fy_token": "101126112382319"
+  },
+  {
+    "underlying": "BSE",
+    "name": "BSE 1400 CE",
+    "lot_size": 200,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:BSE26NOV5600PE",
+    "fy_token": "101126112382522"
+  },
+  {
+    "underlying": "CAMS",
+    "name": "CAMS 550 CE",
+    "lot_size": 825,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:CAMS26NOV1120PE",
+    "fy_token": "101126112382888"
+  },
+  {
+    "underlying": "CANBK",
+    "name": "CANBK 65 CE",
+    "lot_size": 6750,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:CANBK26NOV190PE",
+    "fy_token": "101126112383093"
+  },
+  {
+    "underlying": "CDSL",
+    "name": "CDSL 1840 CE",
+    "lot_size": 475,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:CDSL26NOV1840PE",
+    "fy_token": "101126112383341"
+  },
+  {
+    "underlying": "CGPOWER",
+    "name": "CGPOWER 1140 CE",
+    "lot_size": 850,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:CGPOWER26NOV1360PE",
+    "fy_token": "101126112383637"
+  },
+  {
+    "underlying": "CHOLAFIN",
+    "name": "CHOLAFIN 2260 CE",
+    "lot_size": 625,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:CHOLAFIN26NOV2560PE",
+    "fy_token": "101126112383812"
+  },
+  {
+    "underlying": "CIPLA",
+    "name": "CIPLA 800 CE",
+    "lot_size": 425,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:CIPLA26NOV2000PE",
+    "fy_token": "101126112384359"
+  },
+  {
+    "underlying": "COALINDIA",
+    "name": "COALINDIA 310 CE",
+    "lot_size": 1350,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:COALINDIA26NOV580PE",
+    "fy_token": "101126112384798"
+  },
+  {
+    "underlying": "COCHINSHIP",
+    "name": "COCHINSHIP 2160 CE",
+    "lot_size": 400,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:COCHINSHIP26NOV2240PE",
+    "fy_token": "101126112385071"
+  },
+  {
+    "underlying": "COFORGE",
+    "name": "COFORGE 2140 CE",
+    "lot_size": 475,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:COFORGE26NOV2640PE",
+    "fy_token": "101126112385455"
+  },
+  {
+    "underlying": "COLPAL",
+    "name": "COLPAL 1260 CE",
+    "lot_size": 275,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:COLPAL26NOV2800PE",
+    "fy_token": "101126112385870"
+  },
+  {
+    "underlying": "CONCOR",
+    "name": "CONCOR 280 CE",
+    "lot_size": 1250,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:CONCOR26NOV700PE",
+    "fy_token": "101126112386298"
+  },
+  {
+    "underlying": "CROMPTON",
+    "name": "CROMPTON 165 CE",
+    "lot_size": 2150,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:CROMPTON26NOV360PE",
+    "fy_token": "101126112386535"
+  },
+  {
+    "underlying": "CUMMINSIND",
+    "name": "CUMMINSIND 3300 CE",
+    "lot_size": 200,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:CUMMINSIND26NOV7600PE",
+    "fy_token": "101126112386765"
+  },
+  {
+    "underlying": "DABUR",
+    "name": "DABUR 210 CE",
+    "lot_size": 1250,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:DABUR26NOV580PE",
+    "fy_token": "101126112387223"
+  },
+  {
+    "underlying": "DELHIVERY",
+    "name": "DELHIVERY 660 PE",
+    "lot_size": 2075,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:DELHIVERY26NOV620PE",
+    "fy_token": "101126112387607"
+  },
+  {
+    "underlying": "DIVISLAB",
+    "name": "DIVISLAB 6000 CE",
+    "lot_size": 100,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:DIVISLAB26NOV11200PE",
+    "fy_token": "101126112388118"
+  },
+  {
+    "underlying": "DIXON",
+    "name": "DIXON 8500 CE",
+    "lot_size": 50,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:DIXON26NOV21000PE",
+    "fy_token": "101126112388434"
+  },
+  {
+    "underlying": "DLF",
+    "name": "DLF 400 CE",
+    "lot_size": 950,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:DLF26NOV920PE",
+    "fy_token": "101126112388700"
+  },
+  {
+    "underlying": "DMART",
+    "name": "DMART 2600 CE",
+    "lot_size": 150,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:DMART26NOV5600PE",
+    "fy_token": "101126112389240"
+  },
+  {
+    "underlying": "DRREDDY",
+    "name": "DRREDDY 760 CE",
+    "lot_size": 625,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:DRREDDY26NOV1800PE",
+    "fy_token": "101126112389708"
+  },
+  {
+    "underlying": "EICHERMOT",
+    "name": "EICHERMOT 4400 CE",
+    "lot_size": 100,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:EICHERMOT26NOV11600PE",
+    "fy_token": "101126112390188"
+  },
+  {
+    "underlying": "ETERNAL",
+    "name": "ETERNAL 210 CE",
+    "lot_size": 2425,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ETERNAL26NOV440PE",
+    "fy_token": "101126112390570"
+  },
+  {
+    "underlying": "FEDERALBNK",
+    "name": "FEDERALBNK 220 CE",
+    "lot_size": 2500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:FEDERALBNK26NOV460PE",
+    "fy_token": "101126112391051"
+  },
+  {
+    "underlying": "FORCEMOT",
+    "name": "FORCEMOT 10000 CE",
+    "lot_size": 25,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:FORCEMOT26NOV26000PE",
+    "fy_token": "101126112391140"
+  },
+  {
+    "underlying": "FORTIS",
+    "name": "FORTIS 560 CE",
+    "lot_size": 775,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:FORTIS26NOV1400PE",
+    "fy_token": "101126112391675"
+  },
+  {
+    "underlying": "GAIL",
+    "name": "GAIL 100 CE",
+    "lot_size": 3550,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:GAIL26NOV260PE",
+    "fy_token": "101126112392075"
+  },
+  {
+    "underlying": "GLENMARK",
+    "name": "GLENMARK 1520 CE",
+    "lot_size": 375,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:GLENMARK26NOV3360PE",
+    "fy_token": "101126112392793"
+  },
+  {
+    "underlying": "GMRAIRPORT",
+    "name": "GMRAIRPORT 64 CE",
+    "lot_size": 6975,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:GMRAIRPORT26NOV148PE",
+    "fy_token": "101126112393286"
+  },
+  {
+    "underlying": "GODFRYPHLP",
+    "name": "GODFRYPHLP 1300 CE",
+    "lot_size": 275,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:GODFRYPHLP26NOV3400PE",
+    "fy_token": "101126112393428"
+  },
+  {
+    "underlying": "GODREJCP",
+    "name": "GODREJCP 600 CE",
+    "lot_size": 500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:GODREJCP26NOV1400PE",
+    "fy_token": "101126112394101"
+  },
+  {
+    "underlying": "GODREJPROP",
+    "name": "GODREJPROP 1360 CE",
+    "lot_size": 325,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:GODREJPROP26NOV2720PE",
+    "fy_token": "101126112394691"
+  },
+  {
+    "underlying": "GRASIM",
+    "name": "GRASIM 1840 CE",
+    "lot_size": 250,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:GRASIM26NOV4720PE",
+    "fy_token": "101126112395236"
+  },
+  {
+    "underlying": "GVT&D",
+    "name": "GVT&D 2400 CE",
+    "lot_size": 125,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:GVT&D26NOV6400PE",
+    "fy_token": "101126112395590"
+  },
+  {
+    "underlying": "HAL",
+    "name": "HAL 3200 CE",
+    "lot_size": 150,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HAL26NOV6600PE",
+    "fy_token": "101126112395839"
+  },
+  {
+    "underlying": "HAVELLS",
+    "name": "HAVELLS 800 CE",
+    "lot_size": 500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HAVELLS26NOV1760PE",
+    "fy_token": "101126112396190"
+  },
+  {
+    "underlying": "HCLTECH",
+    "name": "HCLTECH 860 CE",
+    "lot_size": 400,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HCLTECH26NOV1760PE",
+    "fy_token": "101126112396949"
+  },
+  {
+    "underlying": "HDFCAMC",
+    "name": "HDFCAMC 1600 CE",
+    "lot_size": 300,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HDFCAMC26NOV3800PE",
+    "fy_token": "101126112397283"
+  },
+  {
+    "underlying": "HDFCBANK",
+    "name": "HDFCBANK 440 CE",
+    "lot_size": 650,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HDFCBANK26NOV1080PE",
+    "fy_token": "101126112397614"
+  },
+  {
+    "underlying": "HDFCLIFE",
+    "name": "HDFCLIFE 340 CE",
+    "lot_size": 1100,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HDFCLIFE26NOV780PE",
+    "fy_token": "101126112398285"
+  },
+  {
+    "underlying": "HEROMOTOCO",
+    "name": "HEROMOTOCO 3200 CE",
+    "lot_size": 150,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HEROMOTOCO26NOV8000PE",
+    "fy_token": "101126112398509"
+  },
+  {
+    "underlying": "HINDALCO",
+    "name": "HINDALCO 560 CE",
+    "lot_size": 700,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HINDALCO26NOV1520PE",
+    "fy_token": "101126112398817"
+  },
+  {
+    "underlying": "HINDPETRO",
+    "name": "HINDPETRO 300.75 CE",
+    "lot_size": 2025,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HINDPETRO26NOV600PE",
+    "fy_token": "101126112399075"
+  },
+  {
+    "underlying": "HINDUNILVR",
+    "name": "HINDUNILVR 1200 CE",
+    "lot_size": 300,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HINDUNILVR26NOV2960PE",
+    "fy_token": "101126112399980"
+  },
+  {
+    "underlying": "HINDZINC",
+    "name": "HINDZINC 380 CE",
+    "lot_size": 1225,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HINDZINC26NOV320PE",
+    "fy_token": "101126112346347"
+  },
+  {
+    "underlying": "HYUNDAI",
+    "name": "HYUNDAI 1280 CE",
+    "lot_size": 275,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:HYUNDAI26NOV1560PE",
+    "fy_token": "101126112341462"
+  },
+  {
+    "underlying": "ICICIBANK",
+    "name": "ICICIBANK 840 CE",
+    "lot_size": 700,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ICICIBANK26NOV760PE",
+    "fy_token": "101126112346355"
+  },
+  {
+    "underlying": "ICICIGI",
+    "name": "ICICIGI 1040 CE",
+    "lot_size": 325,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ICICIGI26NOV1000PE",
+    "fy_token": "101126112343915"
+  },
+  {
+    "underlying": "ICICIPRULI",
+    "name": "ICICIPRULI 320 CE",
+    "lot_size": 925,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ICICIPRULI26NOV220PE",
+    "fy_token": "101126112345234"
+  },
+  {
+    "underlying": "IDEA",
+    "name": "IDEA 24 CE",
+    "lot_size": 71475,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:IDEA26NOV34PE",
+    "fy_token": "1011261123102133"
+  },
+  {
+    "underlying": "IDFCFIRSTB",
+    "name": "IDFCFIRSTB 52 CE",
+    "lot_size": 9275,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:IDFCFIRSTB26NOV124PE",
+    "fy_token": "101126112342999"
+  },
+  {
+    "underlying": "IEX",
+    "name": "IEX 80 CE",
+    "lot_size": 4350,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:IEX26NOV50PE",
+    "fy_token": "101126112346371"
+  },
+  {
+    "underlying": "INDHOTEL",
+    "name": "INDHOTEL 440 CE",
+    "lot_size": 1000,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:INDHOTEL26NOV540PE",
+    "fy_token": "101126112335737"
+  },
+  {
+    "underlying": "INDIANB",
+    "name": "INDIANB 520 CE",
+    "lot_size": 1000,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:INDIANB26NOV480PE",
+    "fy_token": "101126112345248"
+  },
+  {
+    "underlying": "INDIGO",
+    "name": "INDIGO 2800 CE",
+    "lot_size": 150,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:INDIGO26NOV2400PE",
+    "fy_token": "101126112343001"
+  },
+  {
+    "underlying": "INDUSINDBK",
+    "name": "INDUSINDBK 600 CE",
+    "lot_size": 700,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:INDUSINDBK26NOV600PE",
+    "fy_token": "101126112342206"
+  },
+  {
+    "underlying": "INDUSTOWER",
+    "name": "INDUSTOWER 326 PE",
+    "lot_size": 1700,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:INDUSTOWER26NOV250PE",
+    "fy_token": "101126112343011"
+  },
+  {
+    "underlying": "INFY",
+    "name": "INFY 680 CE",
+    "lot_size": 400,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:INFY26NOV680PE",
+    "fy_token": "101126112342836"
+  },
+  {
+    "underlying": "INOXWIND",
+    "name": "INOXWIND 45 CE",
+    "lot_size": 6400,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:INOXWIND26NOV25PE",
+    "fy_token": "101126112336871"
+  },
+  {
+    "underlying": "IOC",
+    "name": "IOC 80 CE",
+    "lot_size": 4875,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:IOC26NOV70PE",
+    "fy_token": "101126112345250"
+  },
+  {
+    "underlying": "IREDA",
+    "name": "IREDA 70 CE",
+    "lot_size": 4525,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:IREDA26NOV65PE",
+    "fy_token": "101126112345258"
+  },
+  {
+    "underlying": "IRFC",
+    "name": "IRFC 48 CE",
+    "lot_size": 5425,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:IRFC26NOV32PE",
+    "fy_token": "101126112342850"
+  },
+  {
+    "underlying": "ITC",
+    "name": "ITC 170 CE",
+    "lot_size": 1725,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ITC26NOV165PE",
+    "fy_token": "101126112339679"
+  },
+  {
+    "underlying": "JINDALSTEL",
+    "name": "JINDALSTEL 720 CE",
+    "lot_size": 625,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:JINDALSTEL26NOV760PE",
+    "fy_token": "101126112345276"
+  },
+  {
+    "underlying": "JIOFIN",
+    "name": "JIOFIN 150 CE",
+    "lot_size": 2350,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:JIOFIN26NOV110PE",
+    "fy_token": "101126112343994"
+  },
+  {
+    "underlying": "JSWENERGY",
+    "name": "JSWENERGY 360 CE",
+    "lot_size": 1075,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:JSWENERGY26NOV340PE",
+    "fy_token": "101126112339715"
+  },
+  {
+    "underlying": "JSWSTEEL",
+    "name": "JSWSTEEL 800 CE",
+    "lot_size": 675,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:JSWSTEEL26NOV920PE",
+    "fy_token": "101126112345288"
+  },
+  {
+    "underlying": "JUBLFOOD",
+    "name": "JUBLFOOD 320 CE",
+    "lot_size": 1250,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:JUBLFOOD26NOV350PE",
+    "fy_token": "101126112345772"
+  },
+  {
+    "underlying": "KALYANKJIL",
+    "name": "KALYANKJIL 920 CE",
+    "lot_size": 1350,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:KALYANKJIL26NOV320PE",
+    "fy_token": "101126112341521"
+  },
+  {
+    "underlying": "KAYNES",
+    "name": "KAYNES 4850 CE",
+    "lot_size": 150,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:KAYNES26NOV2200PE",
+    "fy_token": "101126112343030"
+  },
+  {
+    "underlying": "KEI",
+    "name": "KEI 3200 CE",
+    "lot_size": 175,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:KEI26NOV2000PE",
+    "fy_token": "101126112346389"
+  },
+  {
+    "underlying": "KFINTECH",
+    "name": "KFINTECH 600 CE",
+    "lot_size": 575,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:KFINTECH26NOV520PE",
+    "fy_token": "101126112345778"
+  },
+  {
+    "underlying": "KOTAKBANK",
+    "name": "KOTAKBANK 240 CE",
+    "lot_size": 2000,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:KOTAKBANK26NOV290PE",
+    "fy_token": "101126112342885"
+  },
+  {
+    "underlying": "KPITTECH",
+    "name": "KPITTECH 320 CE",
+    "lot_size": 775,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:KPITTECH26NOV200PE",
+    "fy_token": "101126112343428"
+  },
+  {
+    "underlying": "LAURUSLABS",
+    "name": "LAURUSLABS 2480 CE",
+    "lot_size": 850,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:LAURUSLABS26NOV2720PE",
+    "fy_token": "101126112346395"
+  },
+  {
+    "underlying": "LICHSGFIN",
+    "name": "LICHSGFIN 320 CE",
+    "lot_size": 1000,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:LICHSGFIN26NOV740PE",
+    "fy_token": "101126112343043"
+  },
+  {
+    "underlying": "LICI",
+    "name": "LICI 260 CE",
+    "lot_size": 1400,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:LICI26NOV220PE",
+    "fy_token": "101126112342218"
+  },
+  {
+    "underlying": "LODHA",
+    "name": "LODHA 960 CE",
+    "lot_size": 625,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:LODHA26NOV760PE",
+    "fy_token": "101126112346422"
+  },
+  {
+    "underlying": "LT",
+    "name": "LT 2400 CE",
+    "lot_size": 175,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:LT26NOV2700PE",
+    "fy_token": "101126112345312"
+  },
+  {
+    "underlying": "LTF",
+    "name": "LTF 200 CE",
+    "lot_size": 2250,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:LTF26NOV180PE",
+    "fy_token": "101126112341565"
+  },
+  {
+    "underlying": "LTM",
+    "name": "LTM 2700 CE",
+    "lot_size": 150,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:LTM26NOV3100PE",
+    "fy_token": "101126112346437"
+  },
+  {
+    "underlying": "LUPIN",
+    "name": "LUPIN 1440 CE",
+    "lot_size": 425,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:LUPIN26NOV1120PE",
+    "fy_token": "101126112343458"
+  },
+  {
+    "underlying": "M&M",
+    "name": "M&M 2000 CE",
+    "lot_size": 200,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:M&M26NOV2300PE",
+    "fy_token": "101126112342232"
+  },
+  {
+    "underlying": "MAHABANK",
+    "name": "MAHABANK 50 CE",
+    "lot_size": 6500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MAHABANK26NOV124PE",
+    "fy_token": "101126112343055"
+  },
+  {
+    "underlying": "MANAPPURAM",
+    "name": "MANAPPURAM 220 CE",
+    "lot_size": 3000,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MANAPPURAM26NOV200PE",
+    "fy_token": "101126112344043"
+  },
+  {
+    "underlying": "MANKIND",
+    "name": "MANKIND 1600 CE",
+    "lot_size": 250,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MANKIND26NOV1560PE",
+    "fy_token": "101126112342935"
+  },
+  {
+    "underlying": "MARICO",
+    "name": "MARICO 520 CE",
+    "lot_size": 1200,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MARICO26NOV440PE",
+    "fy_token": "101126112343474"
+  },
+  {
+    "underlying": "MARUTI",
+    "name": "MARUTI 8400 CE",
+    "lot_size": 50,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MARUTI26NOV6400PE",
+    "fy_token": "101126112345816"
+  },
+  {
+    "underlying": "MAXHEALTH",
+    "name": "MAXHEALTH 640 CE",
+    "lot_size": 525,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MAXHEALTH26NOV1520PE",
+    "fy_token": "101126112339866"
+  },
+  {
+    "underlying": "MAZDOCK",
+    "name": "MAZDOCK 1400 CE",
+    "lot_size": 225,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MAZDOCK26NOV1500PE",
+    "fy_token": "101126112342945"
+  },
+  {
+    "underlying": "MCX",
+    "name": "MCX 2200 CE",
+    "lot_size": 225,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MCX26NOV2300PE",
+    "fy_token": "101126112343069"
+  },
+  {
+    "underlying": "MFSL",
+    "name": "MFSL 880 CE",
+    "lot_size": 400,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MFSL26NOV1000PE",
+    "fy_token": "101126112345327"
+  },
+  {
+    "underlying": "MIDCPNIFTY",
+    "name": "MIDCPNIFTY 16725 CE",
+    "lot_size": 120,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MIDCPNIFTY26NOV19500PE",
+    "fy_token": "101126112364065"
+  },
+  {
+    "underlying": "MOTHERSON",
+    "name": "MOTHERSON 105 CE",
+    "lot_size": 6150,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MOTHERSON26NOV115PE",
+    "fy_token": "101126112343075"
+  },
+  {
+    "underlying": "MOTILALOFS",
+    "name": "MOTILALOFS 560 CE",
+    "lot_size": 775,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MOTILALOFS26NOV1400PE",
+    "fy_token": "101126112336093"
+  },
+  {
+    "underlying": "MPHASIS",
+    "name": "MPHASIS 2338 CE",
+    "lot_size": 275,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MPHASIS26NOV1000PE",
+    "fy_token": "101126112345818"
+  },
+  {
+    "underlying": "MUTHOOTFIN",
+    "name": "MUTHOOTFIN 1800 CE",
+    "lot_size": 275,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:MUTHOOTFIN26NOV1900PE",
+    "fy_token": "101126112345464"
+  },
+  {
+    "underlying": "NAM-INDIA",
+    "name": "NAM-INDIA 800 CE",
+    "lot_size": 625,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NAM-INDIA26NOV640PE",
+    "fy_token": "101126112343502"
+  },
+  {
+    "underlying": "NATIONALUM",
+    "name": "NATIONALUM 220 CE",
+    "lot_size": 1875,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NATIONALUM26NOV180PE",
+    "fy_token": "101126112344067"
+  },
+  {
+    "underlying": "NAUKRI",
+    "name": "NAUKRI 840 CE",
+    "lot_size": 550,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NAUKRI26NOV920PE",
+    "fy_token": "101126112345335"
+  },
+  {
+    "underlying": "NBCC",
+    "name": "NBCC 50 CE",
+    "lot_size": 6500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NBCC26NOV20PE",
+    "fy_token": "101126112345478"
+  },
+  {
+    "underlying": "NESTLEIND",
+    "name": "NESTLEIND 920 CE",
+    "lot_size": 500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NESTLEIND26NOV1020PE",
+    "fy_token": "101126112345826"
+  },
+  {
+    "underlying": "NHPC",
+    "name": "NHPC 44 CE",
+    "lot_size": 6950,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NHPC26NOV50PE",
+    "fy_token": "101126112338117"
+  },
+  {
+    "underlying": "NIFTYFPI",
+    "name": "NIFTYFPI 840 CE",
+    "lot_size": 1100,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NIFTYFPI26NOV2300PE",
+    "fy_token": "101126112365105"
+  },
+  {
+    "underlying": "NIFTYNXT50",
+    "name": "NIFTYNXT50 83700 CE",
+    "lot_size": 25,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NIFTYNXT5026NOV104500PE",
+    "fy_token": "101126112366306"
+  },
+  {
+    "underlying": "NMDC",
+    "name": "NMDC 48 CE",
+    "lot_size": 6750,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NMDC26NOV58PE",
+    "fy_token": "101126112346488"
+  },
+  {
+    "underlying": "NTPC",
+    "name": "NTPC 200 CE",
+    "lot_size": 1500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NTPC26NOV140PE",
+    "fy_token": "101126112339966"
+  },
+  {
+    "underlying": "NYKAA",
+    "name": "NYKAA 220 CE",
+    "lot_size": 3125,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:NYKAA26NOV430PE",
+    "fy_token": "101126112336175"
+  },
+  {
+    "underlying": "OBEROIRLTY",
+    "name": "OBEROIRLTY 1200 CE",
+    "lot_size": 350,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:OBEROIRLTY26NOV1040PE",
+    "fy_token": "101126112345832"
+  },
+  {
+    "underlying": "OFSS",
+    "name": "OFSS 7600 CE",
+    "lot_size": 100,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:OFSS26NOV8600PE",
+    "fy_token": "101126112345522"
+  },
+  {
+    "underlying": "OIL",
+    "name": "OIL 300 CE",
+    "lot_size": 1400,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:OIL26NOV680PE",
+    "fy_token": "101126112341685"
+  },
+  {
+    "underlying": "ONGC",
+    "name": "ONGC 140 CE",
+    "lot_size": 2250,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ONGC26NOV315PE",
+    "fy_token": "101126112342302"
+  },
+  {
+    "underlying": "PAGEIND",
+    "name": "PAGEIND 26000 CE",
+    "lot_size": 20,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PAGEIND26NOV23000PE",
+    "fy_token": "101126112336223"
+  },
+  {
+    "underlying": "PATANJALI",
+    "name": "PATANJALI 190 CE",
+    "lot_size": 1075,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PATANJALI26NOV160PE",
+    "fy_token": "101126112336225"
+  },
+  {
+    "underlying": "PAYTM",
+    "name": "PAYTM 1220 CE",
+    "lot_size": 725,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PAYTM26NOV2320PE",
+    "fy_token": "101126112346528"
+  },
+  {
+    "underlying": "PERSISTENT",
+    "name": "PERSISTENT 4100 CE",
+    "lot_size": 125,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PERSISTENT26NOV8400PE",
+    "fy_token": "101126112338285"
+  },
+  {
+    "underlying": "PETRONET",
+    "name": "PETRONET 170 CE",
+    "lot_size": 1900,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PETRONET26NOV390PE",
+    "fy_token": "101126112340034"
+  },
+  {
+    "underlying": "PFC",
+    "name": "PFC 250 CE",
+    "lot_size": 1300,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PFC26NOV160PE",
+    "fy_token": "101126112340052"
+  },
+  {
+    "underlying": "PGEL",
+    "name": "PGEL 470 CE",
+    "lot_size": 950,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PGEL26NOV380PE",
+    "fy_token": "101126112341717"
+  },
+  {
+    "underlying": "PHOENIXLTD",
+    "name": "PHOENIXLTD 1200 CE",
+    "lot_size": 350,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PHOENIXLTD26NOV2720PE",
+    "fy_token": "101126112343165"
+  },
+  {
+    "underlying": "PIDILITIND",
+    "name": "PIDILITIND 920 CE",
+    "lot_size": 500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PIDILITIND26NOV1080PE",
+    "fy_token": "101126112344105"
+  },
+  {
+    "underlying": "PIIND",
+    "name": "PIIND 1850 CE",
+    "lot_size": 175,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PIIND26NOV1000PE",
+    "fy_token": "101126112346541"
+  },
+  {
+    "underlying": "PNB",
+    "name": "PNB 85 CE",
+    "lot_size": 8000,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PNB26NOV164PE",
+    "fy_token": "1011261123124055"
+  },
+  {
+    "underlying": "PNBHOUSING",
+    "name": "PNBHOUSING 900 CE",
+    "lot_size": 650,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PNBHOUSING26NOV640PE",
+    "fy_token": "101126112340094"
+  },
+  {
+    "underlying": "POLICYBZR",
+    "name": "POLICYBZR 1380 CE",
+    "lot_size": 350,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:POLICYBZR26NOV1040PE",
+    "fy_token": "101126112344109"
+  },
+  {
+    "underlying": "POLYCAB",
+    "name": "POLYCAB 5000 CE",
+    "lot_size": 125,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:POLYCAB26NOV5400PE",
+    "fy_token": "101126112343548"
+  },
+  {
+    "underlying": "POWERGRID",
+    "name": "POWERGRID 150 CE",
+    "lot_size": 1900,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:POWERGRID26NOV140PE",
+    "fy_token": "101126112337254"
+  },
+  {
+    "underlying": "POWERINDIA",
+    "name": "POWERINDIA 19000 CE",
+    "lot_size": 25,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:POWERINDIA26NOV23000PE",
+    "fy_token": "101126112342335"
+  },
+  {
+    "underlying": "PREMIERENE",
+    "name": "PREMIERENE 600 CE",
+    "lot_size": 650,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PREMIERENE26NOV600PE",
+    "fy_token": "101126112345567"
+  },
+  {
+    "underlying": "PRESTIGE",
+    "name": "PRESTIGE 1000 CE",
+    "lot_size": 450,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:PRESTIGE26NOV1000PE",
+    "fy_token": "101126112346561"
+  },
+  {
+    "underlying": "RADICO",
+    "name": "RADICO 3550 CE",
+    "lot_size": 150,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:RADICO26NOV3300PE",
+    "fy_token": "101126112340208"
+  },
+  {
+    "underlying": "RBLBANK",
+    "name": "RBLBANK 210 CE",
+    "lot_size": 3175,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:RBLBANK26NOV600PE",
+    "fy_token": "101126112343558"
+  },
+  {
+    "underlying": "RECLTD",
+    "name": "RECLTD 275 CE",
+    "lot_size": 1575,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:RECLTD26NOV190PE",
+    "fy_token": "101126112341760"
+  },
+  {
+    "underlying": "RELIANCE",
+    "name": "RELIANCE 700 CE",
+    "lot_size": 500,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:RELIANCE26NOV900PE",
+    "fy_token": "101126112346571"
+  },
+  {
+    "underlying": "RVNL",
+    "name": "RVNL 110 CE",
+    "lot_size": 1925,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:RVNL26NOV110PE",
+    "fy_token": "101126112346581"
+  },
+  {
+    "underlying": "SAGILITY",
+    "name": "SAGILITY 26 CE",
+    "lot_size": 12000,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SAGILITY26NOV66PE",
+    "fy_token": "101126112340239"
+  },
+  {
+    "underlying": "SAIL",
+    "name": "SAIL 142.5 CE",
+    "lot_size": 4700,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SAIL26NOV90PE",
+    "fy_token": "101126112345852"
+  },
+  {
+    "underlying": "SBICARD",
+    "name": "SBICARD 380 CE",
+    "lot_size": 800,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SBICARD26NOV860PE",
+    "fy_token": "101126112344183"
+  },
+  {
+    "underlying": "SBILIFE",
+    "name": "SBILIFE 1080 CE",
+    "lot_size": 375,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SBILIFE26NOV960PE",
+    "fy_token": "101126112342349"
+  },
+  {
+    "underlying": "SBIN",
+    "name": "SBIN 580 CE",
+    "lot_size": 750,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SBIN26NOV700PE",
+    "fy_token": "101126112344205"
+  },
+  {
+    "underlying": "SHREECEM",
+    "name": "SHREECEM 16500 CE",
+    "lot_size": 25,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SHREECEM26NOV15500PE",
+    "fy_token": "101126112340276"
+  },
+  {
+    "underlying": "SHRIRAMFIN",
+    "name": "SHRIRAMFIN 820 CE",
+    "lot_size": 825,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SHRIRAMFIN26NOV680PE",
+    "fy_token": "101126112341802"
+  },
+  {
+    "underlying": "SIEMENS",
+    "name": "SIEMENS 3050 CE",
+    "lot_size": 175,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SIEMENS26NOV2700PE",
+    "fy_token": "101126112344211"
+  },
+  {
+    "underlying": "SOLARINDS",
+    "name": "SOLARINDS 12500 CE",
+    "lot_size": 50,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SOLARINDS26NOV26500PE",
+    "fy_token": "101126112344241"
+  },
+  {
+    "underlying": "SONACOMS",
+    "name": "SONACOMS 630 CE",
+    "lot_size": 1225,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SONACOMS26NOV1040PE",
+    "fy_token": "1011261123128109"
+  },
+  {
+    "underlying": "SRF",
+    "name": "SRF 1500 CE",
+    "lot_size": 200,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SRF26NOV1200PE",
+    "fy_token": "101126112346601"
+  },
+  {
+    "underlying": "SUNPHARMA",
+    "name": "SUNPHARMA 1160 CE",
+    "lot_size": 350,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SUNPHARMA26NOV1240PE",
+    "fy_token": "101126112346621"
+  },
+  {
+    "underlying": "SUPREMEIND",
+    "name": "SUPREMEIND 2550 CE",
+    "lot_size": 175,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SUPREMEIND26NOV1600PE",
+    "fy_token": "101126112343578"
+  },
+  {
+    "underlying": "SUZLON",
+    "name": "SUZLON 24 CE",
+    "lot_size": 12700,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SUZLON26NOV26PE",
+    "fy_token": "101126112345862"
+  },
+  {
+    "underlying": "SWIGGY",
+    "name": "SWIGGY 215 CE",
+    "lot_size": 1825,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:SWIGGY26NOV140PE",
+    "fy_token": "101126112342407"
+  },
+  {
+    "underlying": "TATACONSUM",
+    "name": "TATACONSUM 620 CE",
+    "lot_size": 550,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TATACONSUM26NOV660PE",
+    "fy_token": "101126112342419"
+  },
+  {
+    "underlying": "TATAELXSI",
+    "name": "TATAELXSI 1900 CE",
+    "lot_size": 125,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TATAELXSI26NOV2300PE",
+    "fy_token": "101126112344251"
+  },
+  {
+    "underlying": "TATAPOWER",
+    "name": "TATAPOWER 210 CE",
+    "lot_size": 1450,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TATAPOWER26NOV560PE",
+    "fy_token": "101126112345609"
+  },
+  {
+    "underlying": "TATASTEEL",
+    "name": "TATASTEEL 105 CE",
+    "lot_size": 2750,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TATASTEEL26NOV90PE",
+    "fy_token": "101126112340353"
+  },
+  {
+    "underlying": "TCS",
+    "name": "TCS 1780 CE",
+    "lot_size": 225,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TCS26NOV3360PE",
+    "fy_token": "101126112340380"
+  },
+  {
+    "underlying": "TECHM",
+    "name": "TECHM 1220 CE",
+    "lot_size": 600,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TECHM26NOV800PE",
+    "fy_token": "101126112345420"
+  },
+  {
+    "underlying": "TIINDIA",
+    "name": "TIINDIA 1400 CE",
+    "lot_size": 200,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TIINDIA26NOV1700PE",
+    "fy_token": "101126112345430"
+  },
+  {
+    "underlying": "TITAN",
+    "name": "TITAN 3750 CE",
+    "lot_size": 175,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TITAN26NOV3200PE",
+    "fy_token": "101126112341807"
+  },
+  {
+    "underlying": "TMPV",
+    "name": "TMPV 150 CE",
+    "lot_size": 1600,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TMPV26NOV120PE",
+    "fy_token": "101126112340386"
+  },
+  {
+    "underlying": "TORNTPHARM",
+    "name": "TORNTPHARM 2900 CE",
+    "lot_size": 125,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TORNTPHARM26NOV6800PE",
+    "fy_token": "101126112337455"
+  },
+  {
+    "underlying": "TRENT",
+    "name": "TRENT 2150 CE",
+    "lot_size": 225,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TRENT26NOV1900PE",
+    "fy_token": "101126112343269"
+  },
+  {
+    "underlying": "TVSMOTOR",
+    "name": "TVSMOTOR 3450 CE",
+    "lot_size": 175,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:TVSMOTOR26NOV3300PE",
+    "fy_token": "101126112341837"
+  },
+  {
+    "underlying": "ULTRACEMCO",
+    "name": "ULTRACEMCO 11060 PE",
+    "lot_size": 50,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ULTRACEMCO26NOV6000PE",
+    "fy_token": "101126112345666"
+  },
+  {
+    "underlying": "UNIONBANK",
+    "name": "UNIONBANK 137.5 CE",
+    "lot_size": 4425,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:UNIONBANK26NOV135PE",
+    "fy_token": "101126112345878"
+  },
+  {
+    "underlying": "UNITDSPR",
+    "name": "UNITDSPR 920 CE",
+    "lot_size": 400,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:UNITDSPR26NOV880PE",
+    "fy_token": "101126112346653"
+  },
+  {
+    "underlying": "UNOMINDA",
+    "name": "UNOMINDA 900 CE",
+    "lot_size": 550,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:UNOMINDA26NOV840PE",
+    "fy_token": "101126112346661"
+  },
+  {
+    "underlying": "UPL",
+    "name": "UPL 300 CE",
+    "lot_size": 1355,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:UPL26NOV380PE",
+    "fy_token": "101126112340420"
+  },
+  {
+    "underlying": "VBL",
+    "name": "VBL 220 CE",
+    "lot_size": 1275,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:VBL26NOV220PE",
+    "fy_token": "101126112340431"
+  },
+  {
+    "underlying": "VEDL",
+    "name": "VEDL 150 CE",
+    "lot_size": 1150,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:VEDL26NOV170PE",
+    "fy_token": "101126112346701"
+  },
+  {
+    "underlying": "VMM",
+    "name": "VMM 55 CE",
+    "lot_size": 4850,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:VMM26NOV55PE",
+    "fy_token": "101126112346732"
+  },
+  {
+    "underlying": "VOLTAS",
+    "name": "VOLTAS 720 CE",
+    "lot_size": 375,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:VOLTAS26NOV640PE",
+    "fy_token": "101126112342685"
+  },
+  {
+    "underlying": "WAAREEENER",
+    "name": "WAAREEENER 1200 CE",
+    "lot_size": 175,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:WAAREEENER26NOV1700PE",
+    "fy_token": "101126112336610"
+  },
+  {
+    "underlying": "WIPRO",
+    "name": "WIPRO 132.5 CE",
+    "lot_size": 3000,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:WIPRO26NOV105PE",
+    "fy_token": "101126112345698"
+  },
+  {
+    "underlying": "YESBANK",
+    "name": "YESBANK 15 CE",
+    "lot_size": 31100,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:YESBANK26NOV42PE",
+    "fy_token": "101126112346751"
+  },
+  {
+    "underlying": "ZYDUSLIFE",
+    "name": "ZYDUSLIFE 700 CE",
+    "lot_size": 900,
+    "expiries": [
+      "2026-09-29",
+      "2026-10-27",
+      "2026-11-23"
+    ],
+    "inst_types": [
+      "OPT"
+    ],
+    "sample_symbol": "NSE:ZYDUSLIFE26NOV820PE",
+    "fy_token": "101126112343631"
+  }
+]
