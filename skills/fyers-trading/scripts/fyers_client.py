@@ -88,6 +88,12 @@ class FyersClient:
                     continue
                 body = e.read().decode(errors="ignore")
                 raise RuntimeError(f"HTTP {e.code} on {method} {url}: {body}") from e
+            except (urllib.error.URLError, OSError, ConnectionError) as e:
+                if attempt < self.max_retries:
+                    time.sleep(2 ** attempt)
+                    attempt += 1
+                    continue
+                raise RuntimeError(f"Network error on {method} {url}: {e}") from e
 
     def _get(self, url: str) -> dict:
         return self._request("GET", url)
@@ -143,7 +149,7 @@ class FyersClient:
 
     # --- orders (SAFE: dry-run by default) ------------------------------------
     def place_order(self, order: dict, dry_run: bool = True,
-                    validate_symbol: bool = True) -> dict:
+                    validate_symbol: bool = True, meta: dict | None = None) -> dict:
         """Place a regular order. dry_run=True (default) only logs the payload.
 
         Set dry_run=False to actually transmit — do this only with explicit user
@@ -190,7 +196,7 @@ class FyersClient:
                 from .trade_logger import log_order  # lazy import — no hard dep
             except ImportError:
                 from trade_logger import log_order
-            log_order(order, result, dry_run=True)
+            log_order(order, result, dry_run=True, meta=meta)
             return result
 
         try:
@@ -200,13 +206,13 @@ class FyersClient:
                 from .trade_logger import log_order
             except ImportError:
                 from trade_logger import log_order
-            log_order(order, str(exc), dry_run=False)
+            log_order(order, str(exc), dry_run=False, meta=meta)
             raise
         try:
             from .trade_logger import log_order
         except ImportError:
             from trade_logger import log_order
-        log_order(order, result, dry_run=False)
+        log_order(order, result, dry_run=False, meta=meta)
         return result
 
     def cancel_order(self, order_id: str, dry_run: bool = True) -> dict:
@@ -214,6 +220,15 @@ class FyersClient:
             print(f"[DRY-RUN] would DELETE /orders/sync id={order_id}")
             return {"s": "dry_run", "code": 0, "message": "dry-run; nothing sent"}
         return self._request("DELETE", f"{API_BASE}/orders/sync", {"id": order_id})
+
+    def exit_position(self, position_id: str, dry_run: bool = True) -> dict:
+        """Exit one open position by its FYERS position id."""
+        payload = {"id": [position_id]}
+        if dry_run:
+            print(f"[DRY-RUN] would DELETE /positions with: {json.dumps(payload)}")
+            return {"s": "dry_run", "code": 0, "message": "dry-run; nothing sent",
+                    "position": position_id}
+        return self._request("DELETE", f"{API_BASE}/positions", payload)
 
 
 def _cli() -> int:

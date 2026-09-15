@@ -1,0 +1,318 @@
+{
+  "version": "1.0",
+  "description": "Market wisdom and trading rules to remember before placing orders",
+  "last_updated": "2026-09-14",
+  "global_indicators": {
+    "crude_oil": {
+      "symbol": "CRUDEOIL",
+      "exchange": "MCX",
+      "description": "Crude Oil affects inflation and market sentiment",
+      "impact": "High crude = negative for Indian markets"
+    },
+    "usdinr": {
+      "symbol": "USDINR",
+      "exchange": "NSE",
+      "description": "USDINR affects FII flows",
+      "impact": "Strong dollar (USDINR up) = FII outflow = negative for NIFTY"
+    },
+    "us_10y_yield": {
+      "symbol": "US10Y",
+      "description": "US Bond yields affect global risk appetite",
+      "impact": "Rising yields = risk off = negative for emerging markets"
+    }
+  },
+  "categories": [
+    {
+      "id": "MARKET_REVERSAL",
+      "name": "Market Reversal Signals",
+      "rules": [
+        {
+          "id": "HOLIDAY_REVERSAL",
+          "condition": "consecutive_holidays >= 3",
+          "alert": "⚠️ HOLIDAY REVERSAL RISK: Market may reverse after 3+ consecutive holidays. Be cautious with new positions.",
+          "severity": "HIGH",
+          "action": "Consider reducing position size or wait for first 15-min candle to confirm direction"
+        },
+        {
+          "id": "WEEKEND_GAP",
+          "condition": "is_monday AND prev_friday_gap > 0.5%",
+          "alert": "⚠️ WEEKEND GAP: Significant gap up/down expected on Monday opening. Wait for gap filling before entering.",
+          "severity": "MEDIUM",
+          "action": "Avoid first 30 minutes trading, wait for gap fill"
+        },
+        {
+          "id": "EXPIRY_DAY",
+          "condition": "is_expiry_day",
+          "alert": "📅 EXPIRY DAY: High volatility expected. Option premiums will decay rapidly.",
+          "severity": "HIGH",
+          "action": "Avoid buying OTM options, prefer selling or spread strategies"
+        }
+      ]
+    },
+    {
+      "id": "RSI_RULES",
+      "name": "RSI Overbought/Oversold",
+      "rules": [
+        {
+          "id": "RSI_OVERSOLD",
+          "condition": "rsi_eod < 30",
+          "alert": "🟢 RSI OVERSOLD ({}): Market may bounce back. Good opportunity for CE entries.",
+          "severity": "MEDIUM",
+          "action": "Look for reversal signals, consider buying CE on confirmation"
+        },
+        {
+          "id": "RSI_OVERBOUGHT",
+          "condition": "rsi_eod > 70",
+          "alert": "🔴 RSI OVERBOUGHT ({}): Market may correct. Be cautious with CE positions.",
+          "severity": "MEDIUM",
+          "action": "Consider booking profits in CE, look for PE entry on breakdown"
+        },
+        {
+          "id": "RSI_EXTREME_OVERSOLD",
+          "condition": "rsi_eod < 20",
+          "alert": "🟢🟢 RSI EXTREMELY OVERSOLD ({}): Strong bounce expected. High confidence CE setup.",
+          "severity": "HIGH",
+          "action": "Strong buy signal for CE, but wait for candle confirmation"
+        },
+        {
+          "id": "RSI_EXTREME_OVERBOUGHT",
+          "condition": "rsi_eod > 80",
+          "alert": "🔴🔴 RSI EXTREMELY OVERBOUGHT ({}): Sharp correction likely. High confidence PE setup.",
+          "severity": "HIGH",
+          "action": "Strong sell signal for PE, book CE profits immediately"
+        }
+      ]
+    },
+    {
+      "id": "POSITION_MANAGEMENT",
+      "name": "Position Management Rules",
+      "rules": [
+        {
+          "id": "MAX_POSITIONS",
+          "condition": "open_positions >= 3",
+          "alert": "⚠️ MAX POSITIONS: You already have {} open positions. Adding more increases risk.",
+          "severity": "HIGH",
+          "action": "Close losing positions before adding new ones"
+        },
+        {
+          "id": "DAILY_LOSS_LIMIT",
+          "condition": "daily_pnl < -2%",
+          "alert": "🚨 DAILY LOSS LIMIT: Down {}% today. Stop trading for the day.",
+          "severity": "CRITICAL",
+          "action": "Stop all trading, review positions tomorrow"
+        },
+        {
+          "id": "CONSECUTIVE_LOSSES",
+          "condition": "consecutive_losses >= 3",
+          "alert": "⚠️ CONSECUTIVE LOSSES: {} losses in a row. Take a break.",
+          "severity": "HIGH",
+          "action": "Stop trading for 1 hour, review strategy"
+        }
+      ]
+    },
+    {
+      "id": "TIME_RULES",
+      "name": "Time-Based Rules",
+      "rules": [
+        {
+          "id": "MARKET_OPEN_VOLATILITY",
+          "condition": "minutes_since_open < 15",
+          "alert": "⏰ FIRST 15 MINUTES: High volatility, avoid new entries.",
+          "severity": "MEDIUM",
+          "action": "Wait for first 15-min candle to close before entering"
+        },
+        {
+          "id": "LUNCH_HOUR",
+          "condition": "current_hour == 12 OR current_hour == 13",
+          "alert": "⏰ LUNCH HOUR: Low volume, false breakouts common.",
+          "severity": "LOW",
+          "action": "Avoid fresh entries, manage existing positions only"
+        },
+        {
+          "id": "LAST_HOUR",
+          "condition": "minutes_to_close < 60",
+          "alert": "⏰ LAST HOUR: Intraday positions should be closed.",
+          "severity": "HIGH",
+          "action": "Square off intraday positions before 2:30 PM"
+        },
+        {
+          "id": "NO_NEW_TRADES",
+          "condition": "minutes_to_close < 30",
+          "alert": "🚫 NO NEW TRADES: Market closing in 30 minutes.",
+          "severity": "CRITICAL",
+          "action": "Do not enter any new positions"
+        }
+      ]
+    },
+    {
+      "id": "TECHNICAL_RULES",
+      "name": "Technical Analysis Rules",
+      "rules": [
+        {
+          "id": "HIGH_RSI_WITH_CE",
+          "condition": "rsi > 70 AND signal_type == CE",
+          "alert": "⚠️ CAUTION: RSI is {} (overbought) but signal is CE. Risk of buying at top.",
+          "severity": "MEDIUM",
+          "action": "Wait for RSI to cool down or look for PE signals instead"
+        },
+        {
+          "id": "LOW_RSI_WITH_PE",
+          "condition": "rsi < 30 AND signal_type == PE",
+          "alert": "⚠️ CAUTION: RSI is {} (oversold) but signal is PE. Risk of selling at bottom.",
+          "severity": "MEDIUM",
+          "action": "Wait for RSI to rise or look for CE signals instead"
+        },
+        {
+          "id": "VOLUME_CONFIRMATION",
+          "condition": "volume < avg_volume_20d * 0.5",
+          "alert": "⚠️ LOW VOLUME: Volume is {}% of average. Signals may be weak.",
+          "severity": "MEDIUM",
+          "action": "Wait for volume confirmation before entering"
+        }
+      ]
+    },
+    {
+      "id": "EVENT_BASED",
+      "name": "Event-Based Rules",
+      "rules": [
+        {
+          "id": "BUDGET_DAY",
+          "condition": "is_budget_day",
+          "alert": "📅 BUDGET DAY: Extreme volatility expected. Avoid trading.",
+          "severity": "CRITICAL",
+          "action": "Stay out of market or trade very small positions"
+        },
+        {
+          "id": "RBI_POLICY",
+          "condition": "is_rbi_policy_day",
+          "alert": "📅 RBI POLICY DAY: Bank Nifty will be volatile. Avoid BN options.",
+          "severity": "HIGH",
+          "action": "Avoid BANKNIFTY trades, NIFTY may also be affected"
+        },
+        {
+          "id": "US_MARKET_IMPACT",
+          "condition": "us_market_change > 2% OR us_market_change < -2%",
+          "alert": "🇺🇸 US MARKET: S&P moved {}% yesterday. Expect gap opening.",
+          "severity": "MEDIUM",
+          "action": "Wait for opening direction, avoid pre-market trades"
+        }
+      ]
+    },
+    {
+      "id": "CRUDE_OIL_RULES",
+      "name": "Crude Oil Impact Rules",
+      "rules": [
+        {
+          "id": "CRUDE_SPIKE",
+          "condition": "crude_change_1d > 2%",
+          "alert": "🛢️ CRUDE SPIKE: Oil up {}% in 1 day. Indian markets may fall.",
+          "severity": "HIGH",
+          "action": "Avoid CE positions, look for PE on breakdown. Oil sensitive stocks (ONGC, BPCL, IOC) will fall."
+        },
+        {
+          "id": "CRUDE_CRASH",
+          "condition": "crude_change_1d < -2%",
+          "alert": "🛢️ CRUDE CRASH: Oil down {}% in 1 day. Indian markets may rally.",
+          "severity": "HIGH",
+          "action": "Good for CE entries, oil stocks may outperform"
+        },
+        {
+          "id": "CRUDE_ABOVE_90",
+          "condition": "crude_price > 90",
+          "alert": "🛢️ CRUDE HIGH: Oil above $90. Inflation fears, market negative.",
+          "severity": "MEDIUM",
+          "action": "Reduce long positions, prefer PE for hedging"
+        },
+        {
+          "id": "CRUDE_BELOW_70",
+          "condition": "crude_price < 70",
+          "alert": "🛢️ CRUDE LOW: Oil below $70. Bullish for Indian markets.",
+          "severity": "MEDIUM",
+          "action": "Good environment for CE positions"
+        },
+        {
+          "id": "CRUDE_7DAY_TREND",
+          "condition": "crude_change_7d > 10%",
+          "alert": "🛢️ CRUDE TREND: Oil up {}% in 7 days. Sustained negative pressure.",
+          "severity": "HIGH",
+          "action": "Market may correct for few days, avoid fresh CE"
+        }
+      ]
+    },
+    {
+      "id": "USDINR_RULES",
+      "name": "USDINR (Dollar-Rupee) Impact Rules",
+      "rules": [
+        {
+          "id": "INR_WEAKENING",
+          "condition": "inr_weakening > 0.5%",
+          "alert": "💵 RUPEE WEAKENING: INR down {}% vs Dollar. FII selling expected.",
+          "severity": "HIGH",
+          "action": "FII outflow risk, avoid CE. Look for PE on NIFTY"
+        },
+        {
+          "id": "INR_STRENGTHENING",
+          "condition": "usdinr_change_1d < -0.5%",
+          "alert": "💵 RUPEE STRENGTHENING: INR up {}% vs Dollar. FII buying expected.",
+          "severity": "HIGH",
+          "action": "FII inflow positive, good for CE entries"
+        },
+        {
+          "id": "USDAbove85",
+          "condition": "usdinr_rate > 85",
+          "alert": "💵 USDINR HIGH: Dollar above ₹85. Emerging markets under pressure.",
+          "severity": "MEDIUM",
+          "action": "Reduce NIFTY longs, prefer defensive sectors"
+        },
+        {
+          "id": "USD Below 80",
+          "condition": "usdinr_rate < 80",
+          "alert": "💵 USDINR LOW: Dollar below ₹80. Risk-on sentiment, good for India.",
+          "severity": "MEDIUM",
+          "action": "Positive for markets, look for CE opportunities"
+        },
+        {
+          "id": "INR_SHARP_MOVE",
+          "condition": "usdinr_change_1d > 1%",
+          "alert": "💵 SHARP RUPEE FALL: INR crashed {}% today. Market may panic.",
+          "severity": "CRITICAL",
+          "action": "High risk, avoid new positions, hedge existing"
+        }
+      ]
+    },
+    {
+      "id": "GLOBAL_MARKET_RULES",
+      "name": "Global Market Impact Rules",
+      "rules": [
+        {
+          "id": "GIFT_NIFTY_GAP",
+          "condition": "gift_nifty_gap > 1%",
+          "alert": "📊 GIFT NIFTY: Gap up {}%. Expect strong opening.",
+          "severity": "MEDIUM",
+          "action": "Wait for gap fill, don't chase opening"
+        },
+        {
+          "id": "GIFT_NIFTY_GAP_DOWN",
+          "condition": "gift_nifty_gap < -1%",
+          "alert": "📊 GIFT NIFTY: Gap down {}%. Weak opening expected.",
+          "severity": "MEDIUM",
+          "action": "Look for PE after gap fill, avoid CE at open"
+        },
+        {
+          "id": "ASIAN_MARKETS_WEAK",
+          "condition": "asian_markets_avg < -1%",
+          "alert": "🌏 ASIAN MARKETS: Average down {}%. Global risk-off.",
+          "severity": "MEDIUM",
+          "action": "Indian markets may follow, prefer PE"
+        },
+        {
+          "id": "VIX_HIGH",
+          "condition": "india_vix > 20",
+          "alert": "📊 VIX HIGH: India VIX at {}. High volatility expected.",
+          "severity": "MEDIUM",
+          "action": "Option premiums expensive, prefer selling strategies"
+        }
+      ]
+    }
+  ]
+}
