@@ -165,6 +165,86 @@ def token_is_valid(tok: dict | None) -> bool:
         return False
 
 
+def refresh_access_token(tok: dict) -> dict | None:
+    """Attempt to refresh an expired access_token using the cached refresh_token.
+
+    POST https://api-t1.fyers.in/api/v3/validate-refresh-token
+    {
+      "grant_type": "refresh_token",
+      "appIdHash": "<sha256(app_id:secret_id)>",
+      "refresh_token": "<refresh_token>",
+      "pin": "<user_pin>"
+    }
+
+    Returns the updated token dict on success, or None on failure.
+    The refresh token is valid for 15 days; after that, full re-login is required.
+    """
+    refresh_token = tok.get("refresh_token")
+    if not refresh_token:
+        return None
+
+    app_id = tok.get("app_id") or os.environ.get("FYERS_APP_ID", "")
+    secret_id = os.environ.get("FYERS_SECRET_ID", "")
+    pin = os.environ.get("FYERS_PIN", "")
+
+    if not app_id or not secret_id:
+        return None
+
+    if not pin:
+        print("WARNING: FYERS_PIN not set — cannot refresh token. "
+              "Set FYERS_PIN in .env for auto-refresh.", file=sys.stderr)
+        return None
+
+    payload = {
+        "grant_type": "refresh_token",
+        "appIdHash": app_id_hash(app_id, secret_id),
+        "refresh_token": refresh_token,
+        "pin": pin,
+    }
+
+    try:
+        resp = _post(f"{API_BASE}/validate-refresh-token", payload)
+    except SystemExit:
+        return None
+
+    if resp.get("s") != "ok" or "access_token" not in resp:
+        return None
+
+    # Update the cached token with the new access_token
+    tok["access_token"] = resp["access_token"]
+    # Some responses include a new refresh_token
+    if "refresh_token" in resp:
+        tok["refresh_token"] = resp["refresh_token"]
+    tok["refreshed_at"] = int(time.time())
+
+    save_token(tok["app_id"], tok["access_token"], tok.get("refresh_token"))
+    print(f"OK: token refreshed via refresh_token (cached to {TOKEN_PATH})")
+    return tok
+
+
+def auto_refresh_token() -> dict | None:
+    """Try to get a valid token: load cache -> refresh if expired -> return.
+
+    Returns a valid token dict, or None if full re-login is needed.
+    """
+    tok = load_token()
+    if not tok:
+        return None
+
+    # If cached token is still valid, return it
+    if token_is_valid(tok):
+        return tok
+
+    # Token expired — try refresh
+    print("Cached token expired, attempting refresh...")
+    refreshed = refresh_access_token(tok)
+    if refreshed and token_is_valid(refreshed):
+        return refreshed
+
+    print("Refresh failed — full re-login required.", file=sys.stderr)
+    return None
+
+
 def interactive_login() -> dict:
     app_id = _env("FYERS_APP_ID")
     secret_id = _env("FYERS_SECRET_ID")
@@ -201,6 +281,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="FYERS v3 OAuth login helper")
     ap.add_argument("--check", action="store_true", help="exit 0 if cached token is valid")
     ap.add_argument("--print-token", action="store_true", help="print cached access_token")
+    ap.add_argument("--refresh", action="store_true", help="force token refresh and exit")
     args = ap.parse_args()
 
     if args.print_token:
@@ -210,8 +291,17 @@ def main() -> int:
         print(tok["access_token"])
         return 0
 
+    if args.refresh:
+        tok = auto_refresh_token()
+        if tok:
+            print("OK: token refreshed successfully")
+            return 0
+        print("FAILED: could not refresh token — full re-login required", file=sys.stderr)
+        return 1
+
     if args.check:
-        if token_is_valid(load_token()):
+        tok = auto_refresh_token()
+        if tok and token_is_valid(tok):
             print("OK: cached token is valid")
             return 0
         print("INVALID: no valid cached token — run: python scripts/fyers_login.py")

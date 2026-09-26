@@ -51,8 +51,10 @@ symbol in the file:
 python strategies/ema_rsi_atm_call/sample_place_order.py --qty 1 --live
 ```
 
-The script uses the top-level `DEFAULT_QTY = 250` constant when no quantity is supplied.
-Each execution clears and rewrites `../logs/sample_place_order.log`. The log includes
+The equity sample loads its default quantity from
+`strategies/config/equity/config.json` when no quantity is supplied. Each execution clears
+and rewrites `../logs/sample_place_order.log`.
+The log includes
 the exact `ORDER_REQUEST` payload and the final broker result.
 It records `DRY-RUN`, `PLACED` with the broker order ID, `REJECTED` with the FYERS
 error code/message, and authentication or other execution errors.
@@ -65,8 +67,9 @@ Live placement is intentionally explicit:
 python strategies/ema_rsi_atm_call/run.py
 ```
 
-The runner uses `DEFAULT_QTY = 250` and `LIVE = False` constants at the top of
-`run.py`. Change `LIVE` to `True` only when you intentionally want real orders.
+The F&O runner loads `DEFAULT_QTY` from `strategies/config/fno/config.json` and keeps
+`LIVE = False` in `run.py`. Change `LIVE` to `True` only when you intentionally want real
+orders, and set `place_order` to `YES` in the F&O config.
 
 Only the most recent completed candle is evaluated. Conditions:
 

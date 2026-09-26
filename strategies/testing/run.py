@@ -21,12 +21,12 @@ sys.path.insert(0, str(REPO_ROOT / "strategies"))
 LOG_PATH = SCRIPT_DIR.parent / "logs" / "run.log"
 STOCKS_PATH = SCRIPT_DIR / "stocks.txt"
 DEFAULT_DAYS = 10
-DEFAULT_QTY = 250
 LIVE = False
 MARKET_TIMEZONE = ZoneInfo("Asia/Kolkata")
 MARKET_OPEN = dt_time(9, 15)
 LAST_INTRADAY_ENTRY = dt_time(15, 20)
 sys.path.insert(0, str(REPO_ROOT / "skills" / "fyers-trading" / "scripts"))
+sys.path.insert(0, str(REPO_ROOT / "strategies" / "config"))
 
 _indicator_spec = importlib.util.spec_from_file_location(
     "common_indicators", SCRIPT_DIR.parent / "common_indicators.py"
@@ -36,8 +36,12 @@ _indicator_module = importlib.util.module_from_spec(_indicator_spec)
 _indicator_spec.loader.exec_module(_indicator_module)
 ema, rsi = _indicator_module.ema, _indicator_module.rsi
 from fyers_client import FyersAuthError, FyersClient  # noqa: E402
+from order_config import ConfigGatedFyersClient, get_entry_qty  # noqa: E402
 from fyers_symbols import validate_symbol  # noqa: E402
 from option_chain import atm_strike, parse_chain  # noqa: E402
+
+SCRIPT_NAME = "FnoTestRun.py"
+DEFAULT_QTY = get_entry_qty(SCRIPT_NAME)
 
 
 @dataclass(frozen=True)
@@ -138,8 +142,9 @@ def scan_symbol(client: FyersClient, underlying: str, days: int, qty: int, live:
     option = chain["calls"][strike]
     contract = validate_symbol(option["symbol"])
     lot_size = int(contract.get("minLotSize", 1))
+    order_qty = qty * lot_size
     order = {
-        "symbol": option["symbol"], "qty": qty,
+        "symbol": option["symbol"], "qty": order_qty,
         "type": 2, "side": 1, "productType": "INTRADAY", "orderTag": "emarsiatm",
     }
     result["option"] = {"symbol": option["symbol"], "strike": strike, "lot_size": lot_size}
@@ -163,7 +168,10 @@ def main() -> int:
             log_message("SKIPPED: market is closed or the intraday entry window has ended; "
                         "FYERS would reject this MIS order after system square-off")
             return 0
-        client = FyersClient()
+        client = ConfigGatedFyersClient(
+            strategy_name="testing_run",
+            script_name=SCRIPT_NAME,
+        )
         for underlying in read_stocks(STOCKS_PATH):
             result = scan_symbol(client, underlying, DEFAULT_DAYS, DEFAULT_QTY, LIVE)
             if "order" in result:

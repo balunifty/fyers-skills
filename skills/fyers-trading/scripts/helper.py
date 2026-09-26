@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import datetime as dt
 from decimal import Decimal, ROUND_HALF_UP
+from typing import NamedTuple
 
 
 # ---------------------------------------------------------------------------
@@ -126,6 +127,85 @@ def is_expired(expiry_epoch: str, as_of: dt.date | None = None) -> bool:
     """Return True if the contract's expiry date is before today (or as_of)."""
     today = as_of or dt.date.today()
     return expiry_date(expiry_epoch) < today
+
+
+# ---------------------------------------------------------------------------
+# Gap detection helpers
+# ---------------------------------------------------------------------------
+
+class GapResult(NamedTuple):
+    """Result of a gap calculation."""
+    gap_pct: float       # gap as percentage (positive = gap up, negative = gap down)
+    is_gap_up: bool
+    is_gap_down: bool
+    gap_type: str        # "GAP_UP", "GAP_DOWN", "NONE"
+    prev_close: float
+    current_price: float
+
+
+def calculate_gap(prev_close: float, current_price: float) -> GapResult:
+    """Calculate gap percentage between previous close and current price.
+
+    A gap up means current_price > prev_close (market opened higher).
+    A gap down means current_price < prev_close (market opened lower).
+
+    Parameters
+    ----------
+    prev_close    : previous session's closing price
+    current_price : current price (open or LTP at market open)
+
+    Returns
+    -------
+    GapResult with gap_pct, direction flags, and descriptive gap_type string.
+    """
+    if prev_close <= 0:
+        return GapResult(0.0, False, False, "NONE", prev_close, current_price)
+
+    gap_pct = ((current_price - prev_close) / prev_close) * 100.0
+    is_gap_up = gap_pct > 0
+    is_gap_down = gap_pct < 0
+
+    if is_gap_up:
+        gap_type = "GAP_UP"
+    elif is_gap_down:
+        gap_type = "GAP_DOWN"
+    else:
+        gap_type = "NONE"
+
+    return GapResult(round(gap_pct, 4), is_gap_up, is_gap_down, gap_type,
+                     prev_close, current_price)
+
+
+def is_significant_gap(gap_pct: float, threshold_pct: float = 0.5) -> bool:
+    """Return True if the absolute gap exceeds the threshold.
+
+    Parameters
+    ----------
+    gap_pct      : gap percentage (from calculate_gap)
+    threshold_pct: minimum absolute gap % to consider significant (default 0.5%)
+
+    A 0.5% gap on NIFTY 25000 means ~125 points — significant enough to
+    cause whipsaw entries on breakout strategies.
+    """
+    return abs(gap_pct) >= threshold_pct
+
+
+def should_block_order(gap_pct: float, threshold_pct: float = 0.5) -> tuple[bool, str]:
+    """Decide whether to block an order based on gap size.
+
+    Returns
+    -------
+    (blocked, reason): blocked is True if order should be skipped,
+    reason is a human-readable explanation.
+    """
+    if not is_significant_gap(gap_pct, threshold_pct):
+        return False, ""
+
+    direction = "UP" if gap_pct > 0 else "DOWN"
+    return True, (
+        f"GAP {direction} {abs(gap_pct):.2f}% exceeds threshold {threshold_pct}% "
+        f"— order blocked to avoid gap-fill whipsaw"
+    )
 
 
 # ---------------------------------------------------------------------------

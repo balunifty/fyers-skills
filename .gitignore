@@ -5,3 +5,16 @@ __pycache__/
 .env
 CLAUDE.md
 .fyers/
+/strategies/logs
+/strategies/databases
+*.db
+/strategies/config/order_state/
+
+# One-off debug scratch, kept at the repo root. These carry machine-specific
+# absolute paths, so they are useful locally and meaningless to anyone else.
+/check_db.py
+/check_5min_db.py
+/check_symbols.py
+/info.md
+/fyersDataSocket.log
+/.postqode/

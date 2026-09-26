@@ -7,6 +7,7 @@ Uses your existing strategies without any LLM dependency.
 from __future__ import annotations
 
 import datetime as dt
+import importlib.util
 import json
 import os
 import pathlib
@@ -16,9 +17,14 @@ import time
 from dataclasses import dataclass, asdict
 from typing import Optional
 from zoneinfo import ZoneInfo
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Alignment, Font, PatternFill
 
 SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[2]
+# parents[0] is strategies/, parents[1] is the repo root. This used to say
+# parents[2], which pointed a directory above the repo, so the fyers_client and
+# common_indicators imports below both failed and the agent could not start.
+REPO_ROOT = SCRIPT_DIR.parents[1]
 sys.path.insert(0, str(REPO_ROOT / "skills" / "fyers-trading" / "scripts"))
 sys.path.insert(0, str(REPO_ROOT / "strategies" / "utils"))
 
@@ -38,14 +44,180 @@ LOG_PATH = SCRIPT_DIR / "logs" / "agent.log"
 POSITIONS_PATH = SCRIPT_DIR / "data" / "positions.json"
 ALERTS_LOG = SCRIPT_DIR / "logs" / "alerts.log"
 
+STRATEGIES_DIR = SCRIPT_DIR.parent
+EXCEL_DIR = STRATEGIES_DIR / "logs"
+EXCEL_DIR.mkdir(parents=True, exist_ok=True)
+
+# The dashboard columns' strategies live beside the older scripts. They are
+# loaded by path rather than imported, so the agent and the dashboard run the
+# same file for a rule instead of two implementations drifting apart.
+STRATEGY_SCRIPTS_DIR = STRATEGIES_DIR / "scripts"
+
+# Strategies the engine delegates to their own source file. Each entry is
+# (file, function, adapter) where the adapter turns the source's return value
+# into (signal_type, reason) or None. A strategy id absent from this mapping
+# is evaluated by the if/elif chain in _evaluate_strategy; one present here is
+# never handled there, so the two paths cannot both fire for the same id.
+#
+# Only strategies that need nothing but 15-minute candles appear, because
+# SharedDataFetcher.get_candles returns a 15-minute series and nothing else.
+# Anything needing a daily series or 5-minute bars is in strategies.json with
+# engine_support="not_wired" and a stated reason.
+_STRATEGY_MODULE_CACHE: dict[str, object] = {}
+
+
+def load_strategy_module(name: str, path: pathlib.Path):
+    """Load a strategy script by path, once, and cache it."""
+    if name in _STRATEGY_MODULE_CACHE:
+        return _STRATEGY_MODULE_CACHE[name]
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load strategy module {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    _STRATEGY_MODULE_CACHE[name] = module
+    return module
+
+
+def _side_signal(result) -> Optional[tuple[str, str]]:
+    """Adapt an evaluator that returns (side, details), side being a string.
+
+    The sources spell a side three ways: CE/PE, BUY/SELL, and plain boolean
+    for the buy-only crossovers. All of them mean the same two things here.
+    """
+    if not isinstance(result, tuple) or len(result) != 2:
+        return None
+    side, details = result
+    if isinstance(side, bool):
+        if not side:
+            return None
+        return "CE", _reason_from(details, "")
+    side = str(side).upper()
+    if side in ("NONE", "", "FLAT"):
+        return None
+    if side in ("BUY", "CE", "LONG"):
+        return "CE", _reason_from(details, "")
+    if side in ("SELL", "PE", "PUT", "SHORT"):
+        return "PE", _reason_from(details, "")
+    return None
+
+
+def _side_bool(result) -> Optional[tuple[str, str]]:
+    """Adapt an evaluator that returns (matched, details) and is buy-only."""
+    if not isinstance(result, tuple) or len(result) != 2:
+        return None
+    matched, details = result
+    if not matched:
+        return None
+    return "CE", _reason_from(details, "")
+
+
+def _reason_from(details, fallback: str) -> str:
+    """A one-line reason for the alert, preferring the source's own words."""
+    if not isinstance(details, dict):
+        return fallback or ""
+    parts = []
+    rule = details.get("rule") or details.get("trigger")
+    if rule:
+        parts.append(str(rule))
+    reason = details.get("reason")
+    if reason:
+        parts.append(str(reason))
+    return " - ".join(parts) if parts else (fallback or "signal")
+
+
+def judged_at(candles: list) -> dt.datetime:
+    """When the newest bar closed, in market time.
+
+    The rejection evaluators want the moment being judged, not the wall clock.
+    The dashboard passes the same thing while walking a session, and using the
+    bar's own close keeps the agent correct on a weekend or a holiday, when the
+    newest bar belongs to the last session but the clock says otherwise.
+    """
+    if candles:
+        started = dt.datetime.fromtimestamp(candles[-1].epoch, MARKET_TIMEZONE)
+        return started + dt.timedelta(seconds=BAR_SECONDS)
+    return dt.datetime.now(MARKET_TIMEZONE)
+
+
+#: strategy id -> (file, function, adapter). The adapter is called as
+#: adapter(evaluator, candles) because the sources disagree on their
+#: signatures: some take the bar size, some take the judged moment too.
+DELEGATED_STRATEGIES: dict[str, tuple[str, str, object]] = {
+    "STRAT_012": (
+        "EquityEma10_20_Signals15min.py", "ema10_ema20_signal",
+        lambda e, c: _side_signal(e(c, BAR_SECONDS))),
+    "STRAT_013": (
+        "EquityLowerHighCloseSignal15min.py", "lower_high_close_sell_signal",
+        lambda e, c: _side_signal(e(c, BAR_SECONDS))),
+    "STRAT_014": (
+        "EquityEma15_10_20_50Crossover15min.py", "evaluate_fresh_crossover",
+        lambda e, c: _side_bool(e(c))),
+    "STRAT_015": (
+        "EquityEma15_10_20_50Crossover15min.py",
+        "evaluate_ema10_pullback_cross", lambda e, c: _side_bool(e(c))),
+    "STRAT_016": (
+        "R1PrevHighRejectionStrategy.py", "doji_rejection_signal",
+        lambda e, c: _side_signal(e(c, judged_at(c), False))),
+    "STRAT_017": (
+        "R1PrevHighRejectionStrategy.py", "higher_high_low_rejection_signal",
+        lambda e, c: _side_signal(e(c, judged_at(c), False))),
+    "STRAT_018": (
+        "R1PrevHighRejectionStrategy.py",
+        "higher_high_close_rejection_signal",
+        lambda e, c: _side_signal(e(c, judged_at(c), False))),
+    "STRAT_029": (
+        "EquityOrbLowRejectionSignal15min.py", "orb_low_rejection_buy_signal",
+        lambda e, c: _side_signal(e(c, judged_at(c), False))),
+    "STRAT_030": (
+        "EquityDoubleBottomBullishSignal15min.py",
+        "double_bottom_bullish_signal",
+        # No daily series here, so the previous-day leg is unavailable and only
+        # the opening-range leg can carry the signal. The rule reports the leg
+        # it used, and strategies.json says the daily leg is inert here.
+        lambda e, c: _side_signal(e(c, NO_DAILY, judged_at(c), False))),
+    "STRAT_031": (
+        "EquityOpenRangeOpeningSignals15min.py",
+        "second_candle_gap_ema_sell_signal",
+        lambda e, c: _side_signal(e(c, judged_at(c), False))),
+}
+
+
+def _delegated(strategy_id: str, candles: list):
+    """Call a delegated strategy's own source, or return None if not one."""
+    entry = DELEGATED_STRATEGIES.get(strategy_id)
+    if entry is None:
+        return None
+    file_name, function_name, adapter = entry
+    module = load_strategy_module(
+        f"rule_agent_strategy_{pathlib.Path(file_name).stem}",
+        STRATEGY_SCRIPTS_DIR / file_name,
+    )
+    evaluator = getattr(module, function_name, None)
+    if evaluator is None:
+        raise AttributeError(
+            f"{file_name} has no evaluator named {function_name}")
+    return adapter(evaluator, candles)
+
 # Market hours
 MARKET_OPEN = dt.time(9, 15)
-MARKET_CLOSE = dt.time(15, 15)
+MARKET_CLOSE = dt.time(15, 30)
+
+# Bar size of the series the fetcher returns, passed to the evaluators that
+# stamp their own candle times.
+BAR_SECONDS = 15 * 60
+
+#: The fetcher returns 15-minute candles only, so a strategy that can also read
+#: a daily series is handed this instead. The rule must report the leg it could
+#: not test rather than treat the missing level as a passed one.
+NO_DAILY: list = []
 
 # Alert configuration
 ALERT_CONFIG = {
     "console": True,
     "file": True,
+    "excel": True,
     "whatsapp": False,  # Set True to enable
     "telegram": False,  # Set True to enable
 }
@@ -119,7 +291,11 @@ class Position:
 # Alert System (No LLM)
 # =============================================================================
 class AlertSystem:
-    """Simple alert system - console, file, and optional messaging."""
+    """Alert system - console, file, Excel, and optional messaging."""
+
+    EXCEL_HEADERS = ["Date", "Time", "Symbol", "Strategy", "SignalType", "Confidence", "Price", "Details"]
+    HEADER_FILL = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+    HEADER_FONT = Font(color="FFFFFF", bold=True)
 
     def __init__(self, config: dict = None):
         self.config = config or ALERT_CONFIG
@@ -129,6 +305,35 @@ class AlertSystem:
         """Create log directories and files."""
         LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
         ALERTS_LOG.parent.mkdir(parents=True, exist_ok=True)
+        EXCEL_DIR.mkdir(parents=True, exist_ok=True)
+
+    def _get_excel_path(self) -> Path:
+        """Get today's Excel file path (new file each day)."""
+        today = dt.datetime.now(MARKET_TIMEZONE).strftime("%Y-%m-%d")
+        return EXCEL_DIR / f"Agent_Alerts_{today}.xlsx"
+
+    def _ensure_excel_workbook(self, path: Path):
+        """Create Excel workbook with headers if it doesn't exist."""
+        if path.exists():
+            return load_workbook(path)
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Alerts"
+        for col_idx, header in enumerate(self.EXCEL_HEADERS, 1):
+            cell = ws.cell(row=1, column=col_idx, value=header)
+            cell.fill = self.HEADER_FILL
+            cell.font = self.HEADER_FONT
+            cell.alignment = Alignment(horizontal="center")
+        ws.column_dimensions["A"].width = 12
+        ws.column_dimensions["B"].width = 10
+        ws.column_dimensions["C"].width = 25
+        ws.column_dimensions["D"].width = 30
+        ws.column_dimensions["E"].width = 12
+        ws.column_dimensions["F"].width = 12
+        ws.column_dimensions["G"].width = 12
+        ws.column_dimensions["H"].width = 50
+        wb.save(path)
+        return wb
 
     def send_alert(self, signal: Signal):
         """Send alert for a signal."""
@@ -139,6 +344,9 @@ class AlertSystem:
 
         if self.config.get("file"):
             self._write_to_file(message)
+
+        if self.config.get("excel"):
+            self._write_to_excel(signal)
 
         if self.config.get("whatsapp"):
             self._send_whatsapp(message)
@@ -162,6 +370,33 @@ class AlertSystem:
             f.write(f"ALERT [{timestamp}]\n")
             f.write(f"{'='*60}\n")
             f.write(message + "\n")
+
+    def _write_to_excel(self, signal: Signal):
+        """Write alert to today's Excel file."""
+        try:
+            excel_path = self._get_excel_path()
+            wb = self._ensure_excel_workbook(excel_path)
+            ws = wb.active
+
+            now = dt.datetime.now(MARKET_TIMEZONE)
+            row = ws.max_row + 1
+            values = [
+                now.strftime("%Y-%m-%d"),
+                now.strftime("%H:%M:%S"),
+                signal.symbol,
+                signal.strategy_name,
+                signal.signal_type,
+                f"{signal.confidence:.0%}",
+                f"{signal.current_price:.2f}",
+                signal.reason,
+            ]
+            for col_idx, value in enumerate(values, 1):
+                cell = ws.cell(row=row, column=col_idx, value=value)
+                cell.alignment = Alignment(horizontal="left")
+
+            wb.save(excel_path)
+        except Exception as e:
+            print(f"Excel log error: {e}", file=sys.stderr)
 
     def _send_whatsapp(self, message: str):
         """Send WhatsApp message (requires setup)."""
@@ -351,6 +586,35 @@ class StrategyEngine:
 
     def _evaluate_strategy(self, strategy: dict, symbol: str, candles: list) -> Optional[Signal]:
         """Evaluate a single strategy."""
+        # The knowledge base is authoritative. A strategy marked not_wired is
+        # skipped even where a branch or a delegation exists, because the
+        # reason it is not wired is that the engine cannot feed it correctly:
+        # a 5-minute rule read off 15-minute candles, or one needing a daily
+        # series the fetcher does not return. Evaluating it anyway would emit
+        # a confident alert for a rule that is not the one being described.
+        if strategy.get("engine_support") == "not_wired":
+            return None
+
+        # Delegated strategies run their own source file. This happens before
+        # the length guard and the indicator block below, because those exist
+        # for the hand-written chain and a delegated evaluator may need far
+        # less history (the lower-high rule needs two bars).
+        delegated = _delegated(strategy["id"], candles)
+        if delegated is not None:
+            signal_type, reason = delegated
+            return Signal(
+                symbol, strategy["id"], strategy["name"], signal_type,
+                strategy.get("confidence", 0.7),
+                reason or strategy["name"],
+                candles[-1].close if candles else 0.0,
+                {}, self._now(),
+            )
+        if strategy["id"] in DELEGATED_STRATEGIES:
+            # Delegated and silent: the source ran and did not fire. Falling
+            # through to the chain would give the id a second chance at being
+            # evaluated by a different set of rules.
+            return None
+
         if len(candles) < 35:
             return None
 
@@ -460,6 +724,154 @@ class StrategyEngine:
                                 f"Golden cross: EMA10 ({ema10:.2f}) crossed above EMA50 ({ema50:.2f}), RSI={rsi_val:.1f}",
                                 curr.close, indicators, self._now())
 
+        # STRAT_10: Second Candle Breakout (CE)
+        elif strat_id == "STRAT_10":
+            signal = self._evaluate_second_candle_breakout(symbol, strat_id, candles, strategy, indicators)
+            if signal:
+                return signal
+
+        # STRAT_11: Bearish Reversal - Two Bullish Candles (PE)
+        elif strat_id == "STRAT_11":
+            signal = self._evaluate_bearish_reversal(symbol, strat_id, candles, strategy, indicators)
+            if signal:
+                return signal
+
+        return None
+
+    def _find_candle_by_time(self, candles: list, hour: int, minute: int):
+        """Find a candle that starts at the given time (hour, minute) today."""
+        today = dt.date.today()
+        for candle in candles:
+            candle_dt = dt.datetime.fromtimestamp(candle.epoch, MARKET_TIMEZONE)
+            if candle_dt.date() == today and candle_dt.time() == dt.time(hour, minute):
+                return candle
+        return None
+
+    def _get_today_candles(self, candles: list) -> list:
+        """Filter candles to only today's data."""
+        today = dt.date.today()
+        return [c for c in candles if dt.datetime.fromtimestamp(c.epoch, MARKET_TIMEZONE).date() == today]
+
+    def _evaluate_second_candle_breakout(self, symbol: str, strat_id: str, candles: list,
+                                          strategy: dict, indicators: dict) -> Optional[Signal]:
+        """Evaluate Second Candle Breakout strategy (STRAT_10).
+
+        CE signal:
+          - Bullish 2nd candle (9:30): subsequent candle high > 2nd candle high
+          - Bearish 2nd candle: 3rd candle (9:45) close > 2nd candle open
+        """
+        if len(candles) < 3:
+            return None
+
+        second_candle = self._find_candle_by_time(candles, 9, 30)
+        third_candle = self._find_candle_by_time(candles, 9, 45)
+
+        if second_candle is None:
+            return None
+
+        today_candles = self._get_today_candles(candles)
+        if len(today_candles) < 3:
+            return None
+
+        sc_high = second_candle.high
+        sc_low = second_candle.low
+        sc_open = second_candle.open
+        sc_close = second_candle.close
+        sc_dt = dt.datetime.fromtimestamp(second_candle.epoch, MARKET_TIMEZONE)
+        is_bullish = sc_close > sc_open
+
+        if is_bullish:
+            # Bullish: any subsequent candle high breaks above second candle high
+            curr_candle = today_candles[-1]
+            curr_high = curr_candle.high
+            curr_dt = dt.datetime.fromtimestamp(curr_candle.epoch, MARKET_TIMEZONE)
+
+            if curr_dt <= sc_dt:
+                return None
+
+            if curr_high > sc_high:
+                return Signal(symbol, strat_id, strategy["name"], "CE",
+                            strategy.get("confidence", 0.75),
+                            f"2nd candle BULLISH breakout: curr_high={curr_high} > sc_high={sc_high}, SL={sc_low}",
+                            curr_candle.close, indicators, self._now())
+        else:
+            # Bearish: third candle must close above second candle open
+            if third_candle is None:
+                return None
+
+            third_close = third_candle.close
+            third_dt = dt.datetime.fromtimestamp(third_candle.epoch, MARKET_TIMEZONE)
+
+            if third_dt <= sc_dt:
+                return None
+
+            if third_close > sc_open:
+                return Signal(symbol, strat_id, strategy["name"], "CE",
+                            strategy.get("confidence", 0.75),
+                            f"2nd candle BEARISH reversal: 3rd_close={third_close} > sc_open={sc_open}, SL={sc_low}",
+                            third_close, indicators, self._now())
+
+        return None
+
+    def _evaluate_bearish_reversal(self, symbol: str, strat_id: str, candles: list,
+                                    strategy: dict, indicators: dict) -> Optional[Signal]:
+        """Evaluate Bearish Reversal strategy (STRAT_11).
+
+        PE signal when:
+          - 1st candle (9:15) bullish
+          - 2nd candle (9:30) bullish
+          - 3rd candle (9:45) close < 2nd candle high AND shows weakness
+        """
+        if len(candles) < 3:
+            return None
+
+        first_candle = self._find_candle_by_time(candles, 9, 15)
+        second_candle = self._find_candle_by_time(candles, 9, 30)
+        third_candle = self._find_candle_by_time(candles, 9, 45)
+
+        if first_candle is None or second_candle is None or third_candle is None:
+            return None
+
+        first_bullish = first_candle.close > first_candle.open
+        second_bullish = second_candle.close > second_candle.open
+
+        if not first_bullish or not second_bullish:
+            return None
+
+        sc_high = second_candle.high
+        sc_dt = dt.datetime.fromtimestamp(second_candle.epoch, MARKET_TIMEZONE)
+
+        third_close = third_candle.close
+        third_open = third_candle.open
+        third_high = third_candle.high
+        third_dt = dt.datetime.fromtimestamp(third_candle.epoch, MARKET_TIMEZONE)
+
+        if third_dt <= sc_dt:
+            return None
+
+        close_below_second_high = third_close < sc_high
+        body = abs(third_close - third_open)
+        upper_wick = third_high - max(third_close, third_open)
+        rejection = upper_wick > body
+        bearish_close = third_close < third_open
+        lower_high = third_high < sc_high
+
+        weakness = rejection or bearish_close or lower_high
+
+        if close_below_second_high and weakness:
+            reason_parts = []
+            if rejection:
+                reason_parts.append(f"upper_wick={upper_wick:.2f} > body={body:.2f}")
+            if bearish_close:
+                reason_parts.append("bearish close")
+            if lower_high:
+                reason_parts.append(f"high={third_high} < sc_high={sc_high}")
+
+            return Signal(symbol, strat_id, strategy["name"], "PE",
+                        strategy.get("confidence", 0.72),
+                        f"Bearish reversal: 3rd_close={third_close} < sc_high={sc_high}, weakness: {', '.join(reason_parts)}",
+                        third_close, indicators, self._now())
+
         return None
 
     def _now(self) -> str:
@@ -534,6 +946,13 @@ class TradingAgent:
 
     def process_signals(self, signals: list[Signal]):
         """Process and alert for signals with market wisdom checks."""
+        # Check for gap-blocked state
+        context = self._get_market_context()
+        if context.get("gap_blocked"):
+            print(f"\n🚫 GAP BLOCKED: {context.get('gap_reason', 'NIFTY gap too large')}")
+            print("   Skipping all new entries until gap fills.")
+            return
+
         for signal in signals:
             # Only alert for high confidence signals
             if signal.confidence >= 0.7:
@@ -556,7 +975,7 @@ class TradingAgent:
         """Get current market context for wisdom checks."""
         now = dt.datetime.now(MARKET_TIMEZONE)
         market_open = dt.time(9, 15)
-        market_close = dt.time(15, 15)
+        market_close = dt.time(15, 30)
 
         minutes_since_open = 0
         if now.time() >= market_open:
@@ -583,12 +1002,13 @@ class TradingAgent:
         }
 
     def _get_global_context(self) -> dict:
-        """Fetch global market context (crude, USDINR, VIX)."""
+        """Fetch global market context (crude, USDINR, VIX, gap)."""
         try:
             fetcher = GlobalMarketFetcher()
             crude = fetcher.get_crude_oil()
             usdinr = fetcher.get_usdinr()
             vix = fetcher.get_india_vix()
+            gap_ctx = fetcher.get_gap_context(threshold_pct=0.5)
 
             context = {}
 
@@ -604,6 +1024,9 @@ class TradingAgent:
 
             if vix:
                 context["india_vix"] = vix.get("ltp", 15)
+
+            # Merge gap context
+            context.update(gap_ctx)
 
             return context
         except Exception as e:

@@ -16,9 +16,11 @@ from zoneinfo import ZoneInfo
 SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[2]
 sys.path.insert(0, str(REPO_ROOT / "skills" / "fyers-trading" / "scripts"))
+sys.path.insert(0, str(REPO_ROOT / "strategies" / "config"))
 sys.path.insert(0, str(REPO_ROOT / "strategies" / "utils"))
 
-from fyers_client import FyersClient  # noqa: E402
+from order_config import ConfigGatedFyersClient, get_entry_qty  # noqa: E402
+from fyers_symbols import validate_symbol  # noqa: E402
 from shared_data_fetcher import SharedDataFetcher  # noqa: E402
 from common_indicators import ema, rsi, hma  # noqa: E402
 
@@ -26,6 +28,7 @@ from common_indicators import ema, rsi, hma  # noqa: E402
 # Configuration
 # =============================================================================
 MARKET_TIMEZONE = ZoneInfo("Asia/Kolkata")
+SCRIPT_NAME = "FnoFyersTools.py"
 KNOWLEDGE_DIR = SCRIPT_DIR / "knowledge"
 STRATEGIES_FILE = KNOWLEDGE_DIR / "strategies.json"
 
@@ -50,7 +53,10 @@ class FyersTools:
     """Collection of tools for FYERS API interaction."""
 
     def __init__(self):
-        self.client = FyersClient()
+        self.client = ConfigGatedFyersClient(
+            strategy_name="trading_agent",
+            script_name=SCRIPT_NAME,
+        )
         self.fetcher = SharedDataFetcher()
         self.strategies = self._load_strategies()
 
@@ -283,24 +289,28 @@ class FyersTools:
         except Exception as e:
             return ToolResult(False, None, str(e))
 
-    def place_order(self, symbol: str, side: str, quantity: int,
+    def place_order(self, symbol: str, side: str, quantity: int | None = None,
                     order_type: str = "MARKET", product: str = "INTRADAY") -> ToolResult:
         """Place an order.
 
         Args:
             symbol: FYERS symbol
             side: "BUY" or "SELL"
-            quantity: Number of shares/lots
+            quantity: Retained for tool compatibility; config.json qty is authoritative
             order_type: "MARKET" or "LIMIT"
             product: "INTRADAY" or "CNC"
         """
         try:
+            del quantity
             side_val = 1 if side.upper() == "BUY" else -1
-            type_val = 20 if order_type.upper() == "MARKET" else 2
+            type_val = 2 if order_type.upper() == "MARKET" else 1
+            contract = validate_symbol(symbol)
+            lot_size = int(contract.get("minLotSize", 1))
+            order_qty = get_entry_qty(SCRIPT_NAME) * lot_size
 
             order = {
                 "symbol": symbol,
-                "qty": quantity,
+                "qty": order_qty,
                 "type": type_val,
                 "side": side_val,
                 "productType": product,
@@ -426,10 +436,10 @@ class FyersTools:
                     "properties": {
                         "symbol": {"type": "string"},
                         "side": {"type": "string", "enum": ["BUY", "SELL"]},
-                        "quantity": {"type": "integer"},
+                        "quantity": {"type": "integer", "description": "Ignored; config.json qty is used"},
                         "order_type": {"type": "string", "enum": ["MARKET", "LIMIT"], "default": "MARKET"}
                     },
-                    "required": ["symbol", "side", "quantity"]
+                    "required": ["symbol", "side"]
                 }
             },
             {

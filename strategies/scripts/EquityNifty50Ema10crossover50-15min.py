@@ -25,6 +25,7 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "strategies"))
 sys.path.insert(0, str(REPO_ROOT / "strategies" / "utils"))
 sys.path.insert(0, str(REPO_ROOT / "skills" / "fyers-trading" / "scripts"))
+sys.path.insert(0, str(STRATEGIES_DIR / "config"))
 sys.path.insert(0, str(SCRIPT_DIR))
 
 _indicator_spec = importlib.util.spec_from_file_location(
@@ -38,12 +39,14 @@ ema, hma, wma = _indicator_module.ema, _indicator_module.hma, _indicator_module.
 rsi = _indicator_module.rsi
 hma = _indicator_module.hma
 from fyers_client import FyersAuthError, FyersClient  # noqa: E402
+from order_config import ConfigGatedFyersClient, get_entry_qty  # noqa: E402
 from excel_logger import log_to_excel  # noqa: E402
 
 STOCKS_PATH = STRATEGIES_DIR / "data" / "Nifty50.txt"
 DATABASE_PATH = STRATEGIES_DIR / "databases" / "nifty50.db"
 ENTERED_PATH = STRATEGIES_DIR / "data" / "entered_symbols.json"
 STRATEGY_NAME = "EMA10_CROSS_EMA50_15MIN_CANDLE"
+SCRIPT_NAME = "EquityNifty50Ema10crossover50-15min.py"
 
 # --- Tuning constants (swap values for testing, revert before production) -------
 LIVE = True                          # True = send real orders
@@ -53,15 +56,14 @@ HISTORY_DAYS = 10                     # calendar days of candle history to fetch
 # HISTORY_DAYS = 2                    #   <-- test: shorter history
 MARKET_TIMEZONE = ZoneInfo("Asia/Kolkata")
 MARKET_OPEN = dt.time(9, 15)          # IST market open
-MARKET_CLOSE = dt.time(15, 45)        # IST market close (prod: 15:45)
+MARKET_CLOSE = dt.time(15, 30)        # IST market close (prod: 15:30)
 # MARKET_CLOSE = dt.time(23, 59)      #   <-- test: run outside market hours
 MAX_API_CALLS_PER_SECOND = 8          # broker rate-limit ceiling
 # MAX_API_CALLS_PER_SECOND = 2        #   <-- test: gentler on API
-ENTRY_QTY = 1                          # number of shares per entry order
-ENTRY_ORDER_TYPE = 2                   # 1=Limit 2=Market 3=SL-M 4=SL-L
+ENTRY_ORDER_TYPE = 1                   # 1=Limit 2=Market 3=SL-M 4=SL-L
 ENTRY_PRODUCT_TYPE = "INTRADAY"        # INTRADAY | CNC | MARGIN
 RSI_ENTRY_THRESHOLD = 55               # RSI must cross above this to enter
-MAX_ORDERS_PER_DAY = 3                 # Maximum orders per day
+LIMIT_BUFFER_PERCENT = 0.10            # 10% of candle range for limit order buffer
 # --------------------------------------------------------------------------------
 
 
@@ -392,22 +394,18 @@ def enter_position_if_triggered(client: FyersClient, symbol: str,
                                 entered: set[str]) -> None:
     """Place a BUY order when EMA10/EMA50 + RSI entry conditions are met.
 
-    Skips if:
-      - Symbol was already entered today (persisted to disk)
-      - Max orders per day reached
+    Skips if the symbol was already entered today (persisted to disk).
     """
-    SCRIPT_NAME = "agentNifty50.py"
+    SCRIPT_NAME = "EquityNifty50Ema10crossover50-15min.py"
     if symbol in entered:
-        return
-    if len(entered) >= MAX_ORDERS_PER_DAY:
-        log_message(f"ENTRY_SKIP: Max orders ({MAX_ORDERS_PER_DAY}) reached for today")
-        log_to_excel(STRATEGY_NAME, SCRIPT_NAME, symbol, "SIGNAL_MATCH", "SKIPPED", details="Max orders reached")
         return
     triggered, details = ema_rsi_entry_signal(candles)
     if not triggered:
         return
     log_signal(symbol, "EMA_RSI_ENTRY", details)
 
+    ltp = candles[-1].close
+    candle_range = candles[-1].high - candles[-1].low
     positions = limiter.call(client.positions).get("netPositions", [])
     for pos in positions:
         pos_symbol = pos.get("symbol") or pos.get("symbolName")
@@ -419,21 +417,24 @@ def enter_position_if_triggered(client: FyersClient, symbol: str,
             save_entered(entered)
             return
 
+    entry_qty = get_entry_qty(SCRIPT_NAME)
+    buffer = candle_range * LIMIT_BUFFER_PERCENT
     order = {
         "symbol": symbol,
-        "qty": ENTRY_QTY,
+        "qty": entry_qty,
         "type": ENTRY_ORDER_TYPE,
         "side": 1,                       # 1 = BUY
         "productType": ENTRY_PRODUCT_TYPE,
+        "limitPrice": ltp - buffer,
         "orderTag": "ema_rsi_entry",
     }
-    meta = {"strategy": STRATEGY_NAME, "signal": "ENTRY", "description": f"EMA/RSI entry for {symbol}"}
+    meta = {"strategy": STRATEGY_NAME, "signal": "ENTRY", "description": f"EMA/RSI entry for {symbol}, buffer={buffer:.2f}"}
     log_message(f"ENTRY_ORDER: {json.dumps(order, sort_keys=True)}")
     response = limiter.call(client.place_order, order, dry_run=not live, meta=meta)
     order_id = response.get("id") or response.get("id_fyers", "not_returned")
     print_entry_result(symbol, order_id, response)
     order_status = "DRY_RUN" if not live else "PLACED"
-    log_to_excel(STRATEGY_NAME, SCRIPT_NAME, symbol, "ENTRY", order_status, order_id=order_id, details=f"Qty={ENTRY_QTY}")
+    log_to_excel(STRATEGY_NAME, SCRIPT_NAME, symbol, "ENTRY", order_status, order_id=order_id, details=f"Qty={entry_qty}")
     entered.add(symbol)
     save_entered(entered)
 
@@ -464,12 +465,14 @@ def exit_position_if_hma_cross(client: FyersClient, symbol: str,
             pos_symbol = pos.get("symbol") or pos.get("symbolName")
             net_qty = int(pos.get("netQty", 0))
             if pos_symbol == symbol and net_qty != 0:
+                buffer = ltp * 0.02  # 2% buffer for exit
                 order = {
                     "symbol": pos_symbol,
                     "qty": abs(net_qty),
-                    "type": 2,
+                    "type": 1,
                     "side": -1,
                     "productType": ENTRY_PRODUCT_TYPE,
+                    "limitPrice": ltp + buffer,
                     "orderTag": "hma21_exit",
                 }
                 meta = {"strategy": STRATEGY_NAME, "signal": "EXIT", "description": f"HMA21 exit for {symbol}, close={current_close} < HMA21={current_hma:.2f}"}
@@ -490,7 +493,10 @@ def main() -> int:
         if not symbols:
             raise ValueError(f"no symbols found in {STOCKS_PATH}")
         DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        client = FyersClient()
+        client = ConfigGatedFyersClient(
+            strategy_name=STRATEGY_NAME,
+            script_name=SCRIPT_NAME,
+        )
         limiter = ApiRateLimiter()
         entered = load_entered()
         log_message(f"STARTED [{STRATEGY_NAME}]: {len(symbols)} symbols, interval={POLL_SECONDS}s, "

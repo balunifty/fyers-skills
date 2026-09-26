@@ -127,6 +127,106 @@ class GlobalMarketFetcher:
         """Get India VIX."""
         return self.cache.get("india_vix")
 
+    def detect_gap(self, symbol: str, threshold_pct: float = 0.5) -> dict | None:
+        """Detect if a symbol has gapped up or down at market open.
+
+        Compares the current open price with the previous close to calculate
+        the gap percentage. Returns gap info if the gap exceeds the threshold.
+
+        Parameters
+        ----------
+        symbol       : FYERS symbol (e.g. "NSE:NIFTY不上-INDEX" for NIFTY)
+        threshold_pct: minimum absolute gap % to report (default 0.5%)
+
+        Returns
+        -------
+        dict with keys: symbol, prev_close, open, gap_pct, gap_type ("GAP_UP"/"GAP_DOWN"/"NONE"),
+        is_significant, or None if fetch fails.
+        """
+        try:
+            response = self.client.quotes([symbol])
+            if response.get("s") != "ok":
+                return None
+
+            for item in response.get("d", []):
+                v = item.get("v", {})
+                ltp = v.get("lp", 0)
+                prev_close = v.get("prev_close", 0)
+                open_price = v.get("open", 0)
+
+                if prev_close <= 0:
+                    return None
+
+                # Use open price for gap at market open; fall back to LTP
+                ref_price = open_price if open_price > 0 else ltp
+                gap_pct = ((ref_price - prev_close) / prev_close) * 100.0
+
+                if gap_pct > 0:
+                    gap_type = "GAP_UP"
+                elif gap_pct < 0:
+                    gap_type = "GAP_DOWN"
+                else:
+                    gap_type = "NONE"
+
+                is_significant = abs(gap_pct) >= threshold_pct
+
+                return {
+                    "symbol": symbol,
+                    "prev_close": prev_close,
+                    "open": open_price,
+                    "ltp": ltp,
+                    "gap_pct": round(gap_pct, 4),
+                    "gap_type": gap_type,
+                    "is_significant": is_significant,
+                    "threshold_pct": threshold_pct,
+                }
+
+        except Exception as e:
+            print(f"Error detecting gap for {symbol}: {e}", file=sys.stderr)
+            return None
+
+    def detect_nifty_gap(self, threshold_pct: float = 0.5) -> dict | None:
+        """Detect gap for NIFTY 50 index (primary gap indicator for Indian markets).
+
+        Uses NIFTY 50 open vs previous close as the main gap signal.
+        """
+        # Try multiple NIFTY symbols
+        nifty_symbols = ["NSE:NIFTY不上-INDEX", "NSE:NIFTY不上"]
+        for sym in nifty_symbols:
+            result = self.detect_gap(sym, threshold_pct)
+            if result:
+                return result
+        return None
+
+    def get_gap_context(self, threshold_pct: float = 0.5) -> dict:
+        """Get gap context for market wisdom checks.
+
+        Returns a dict suitable for merging into the market context:
+        {
+            "gift_nifty_gap": float,       # gap percentage (for market_wisdom rules)
+            "nifty_gap": dict | None,      # full gap detection result
+            "gap_blocked": bool,           # True if gap exceeds threshold
+            "gap_reason": str,             # human-readable reason if blocked
+        }
+        """
+        gap_info = self.detect_nifty_gap(threshold_pct)
+        context = {
+            "gift_nifty_gap": gap_info["gap_pct"] if gap_info else 0,
+            "nifty_gap": gap_info,
+            "gap_blocked": False,
+            "gap_reason": "",
+        }
+
+        if gap_info and gap_info["is_significant"]:
+            direction = "UP" if gap_info["gap_pct"] > 0 else "DOWN"
+            context["gap_blocked"] = True
+            context["gap_reason"] = (
+                f"NIFTY gap {direction} {abs(gap_info['gap_pct']):.2f}% "
+                f"— orders blocked until gap fills"
+            )
+
+        return context
+
     def get_market_sentiment(self) -> dict:
         """Analyze overall market sentiment from global indicators."""
         crude = self.get_crude_oil()

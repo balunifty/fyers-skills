@@ -9,6 +9,7 @@ import re
 import sqlite3
 import sys
 import threading
+import time
 from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 
@@ -40,7 +41,11 @@ LOG_PATH = STRATEGIES_DIR / "logs" / "websocketNiftyFNOTop100.log"
 INDEX_SYMBOLS = ["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX"]
 MARKET_TIMEZONE = ZoneInfo("Asia/Kolkata")
 MARKET_OPEN = dt.time(9, 15)
-MARKET_CLOSE = dt.time(15, 45)
+#: The NSE cash session ends at 15:30. This was 15:45, which let the tick
+#: filter below accept a quarter-hour past the close and open a 15:30 candle
+#: that no other script in the repo produces. Every other price here is stamped
+#: against the same close.
+MARKET_CLOSE = dt.time(15, 30)
 
 
 @dataclass
@@ -64,6 +69,39 @@ def log_error(message: str) -> None:
     with LOG_PATH.open("a", encoding="utf-8") as log_file:
         log_file.write(entry + "\n")
     print(entry, file=sys.stderr)
+
+
+def log_event(message: str) -> None:
+    """Record a normal lifecycle event, so a silent task can be explained.
+
+    The task scheduler only says the task ran; it cannot say why a run produced
+    no candles. Writing the reason here means an idle weekend is visible in the
+    log rather than looking like a failure.
+    """
+    entry = f"{dt.datetime.now().isoformat(timespec='seconds')} {message}"
+    with LOG_PATH.open("a", encoding="utf-8") as log_file:
+        log_file.write(entry + "\n")
+    print(message)
+
+
+def now_ist() -> dt.datetime:
+    return dt.datetime.now(MARKET_TIMEZONE)
+
+
+def session_phase(moment: dt.datetime) -> str:
+    """Classify an instant as weekend, pre-open, closed or open.
+
+    India has no daylight saving, so a plain local clock is the same wall time,
+    but the zone is still made explicit because every stored candle is stamped
+    in it and a drifting server clock would silently mis-file bars.
+    """
+    if moment.weekday() >= 5:
+        return "weekend"
+    if moment.time() < MARKET_OPEN:
+        return "pre-open"
+    if moment.time() > MARKET_CLOSE:
+        return "closed"
+    return "open"
 
 
 def table_name(symbol: str) -> str:
@@ -152,6 +190,19 @@ def main() -> int:
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     LOG_PATH.touch(exist_ok=True)
     clear_log_on_new_day()
+
+    # Nothing is streamed outside the session, and connecting anyway only
+    # produces a socket the exchange keeps dropping. The task is scheduled
+    # Mon-Fri but can still be started on a weekend, because it is set to start
+    # whenever the machine becomes available.
+    phase = session_phase(now_ist())
+    if phase in ("weekend", "closed"):
+        log_event(
+            f"No session to stream at {now_ist():%a %d %b %H:%M} IST ({phase}). "
+            f"Nothing to do; exiting so the task does not sit idle."
+        )
+        return 0
+
     try:
         token = load_token()
         if not token or not token.get("app_id") or not token.get("access_token"):
@@ -162,12 +213,22 @@ def main() -> int:
         DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
         connection = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
         store = CandleStore(connection)
-        print(f"WebSocket agent started: {len(symbols)} symbols, "
-              f"market={MARKET_OPEN}-{MARKET_CLOSE} IST")
+        log_event(f"WebSocket agent started: {len(symbols)} symbols, "
+                  f"market={MARKET_OPEN:%H:%M}-{MARKET_CLOSE:%H:%M} IST")
+
+        reconnect_count = [0]
+        MAX_RECONNECTS = 5
+        # Set by on_error, acted on by the main thread. Closing the socket from
+        # inside the callback would join the very thread running the callback.
+        stop_reason = [None]
 
         def on_open() -> None:
-            socket.subscribe(symbols=symbols, data_type="SymbolUpdate")
-            print(f"Subscribed to {len(symbols)} symbols")
+            reconnect_count[0] = 0
+            batch_size = 95
+            for i in range(0, len(symbols), batch_size):
+                batch = symbols[i:i + batch_size]
+                socket.subscribe(symbols=batch, data_type="SymbolUpdate")
+                print(f"Subscribed batch {i // batch_size + 1}: {len(batch)} symbols")
 
         def on_message(message: dict) -> None:
             if not isinstance(message, dict):
@@ -178,16 +239,22 @@ def main() -> int:
             if symbol not in symbols or price is None or timestamp is None:
                 return
             tick_time = dt.datetime.fromtimestamp(int(timestamp), MARKET_TIMEZONE)
-            if tick_time.weekday() >= 5 or not (MARKET_OPEN <= tick_time.time() <= MARKET_CLOSE):
+            if session_phase(tick_time) != "open":
                 return
             store.update(symbol, int(timestamp), float(price),
                          float(message.get("vol_traded_today") or 0))
 
-        def on_error(error) -> None:
-            log_error(f"WebSocket error: {error}")
-
         def on_close(message) -> None:
             log_error(f"WebSocket closed: {message}")
+
+        def on_error(error) -> None:
+            log_error(f"WebSocket error: {error}")
+            reconnect_count[0] += 1
+            if reconnect_count[0] >= MAX_RECONNECTS:
+                # Flag it rather than closing here: close_connection() joins the
+                # thread this callback is running on, which would raise.
+                log_error(f"Max reconnections ({MAX_RECONNECTS}) reached. Stopping.")
+                stop_reason[0] = f"{MAX_RECONNECTS} consecutive errors"
 
         log_dir = STRATEGIES_DIR / "logs"
         log_dir.mkdir(parents=True, exist_ok=True)
@@ -197,6 +264,27 @@ def main() -> int:
             on_connect=on_open, on_message=on_message, on_error=on_error, on_close=on_close,
         )
         socket.connect()
+
+        # Hold the process for the session instead of letting it idle.
+        #
+        # connect() returns straight away, so on its own this script would exit
+        # and the task would show Ready. It stays alive only because the SDK
+        # starts non-daemon threads - and one of them, the message thread, waits
+        # on a condition variable that nothing ever signals once the socket is
+        # gone. That is why the task previously sat in Running for the whole
+        # weekend: not because it was working, but because nothing could shut it
+        # down. Returning at the close lets close_connection() release them all,
+        # so the process ends on its own and the schedule's 10-minute repeat
+        # works as the restart watchdog it was meant to be.
+        while stop_reason[0] is None:
+            phase = session_phase(now_ist())
+            if phase in ("weekend", "closed"):
+                stop_reason[0] = f"session ended ({phase})"
+                break
+            time.sleep(15)
+
+        log_event(f"Closing: {stop_reason[0]}")
+        socket.close_connection()
         return 0
     except (FyersAuthError, ImportError, OSError, ValueError, sqlite3.Error) as error:
         log_error(str(error))

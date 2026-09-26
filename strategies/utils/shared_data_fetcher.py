@@ -180,8 +180,11 @@ class SharedDataFetcher:
             if candles:
                 return candles
 
-        # Fetch from API
-        return self._fetch_from_api(symbol)
+        # Fetch from API (stores new candles in cache)
+        self._fetch_from_api(symbol)
+        # Re-read from cache to return all candles including newly stored ones
+        candles = self._get_from_api_cache(symbol)
+        return candles if candles else []
 
     def _get_from_websocket(self, symbol: str) -> list[Candle] | None:
         """Get candles from websocket database."""
@@ -247,7 +250,7 @@ class SharedDataFetcher:
         """Get candles from API cache database."""
         with sqlite3.connect(API_CACHE_DB_PATH) as conn:
             cursor = conn.execute(
-                """SELECT epoch, open, high, low, close, volume
+                """SELECT epoch, open, high, low, close, volume, fetched_at
                    FROM candles_15min
                    WHERE symbol = ?
                    ORDER BY epoch DESC
@@ -259,13 +262,17 @@ class SharedDataFetcher:
         if not rows:
             return None
 
-        # Check if data is fresh (fetched within last hour)
-        latest_epoch = rows[0][0]
-        now = dt.datetime.now(dt.timezone.utc)
-        fetched_time = dt.datetime.fromtimestamp(latest_epoch, dt.timezone.utc)
-        age_minutes = (now - fetched_time).total_seconds() / 60
-        if age_minutes > 60:
-            return None
+        # Check if data was fetched recently (within last hour)
+        fetched_at_str = rows[0][6]
+        if fetched_at_str:
+            try:
+                fetched_time = dt.datetime.fromisoformat(fetched_at_str)
+                now = dt.datetime.now(dt.timezone.utc)
+                age_minutes = (now - fetched_time).total_seconds() / 60
+                if age_minutes > 60:
+                    return None
+            except (ValueError, TypeError):
+                pass
 
         return [Candle(epoch=r[0], open=r[1], high=r[2], low=r[3], close=r[4], volume=r[5])
                 for r in reversed(rows)]

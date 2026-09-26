@@ -30,11 +30,18 @@ from zoneinfo import ZoneInfo
 SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[1]
 sys.path.insert(0, str(REPO_ROOT / "skills" / "fyers-trading" / "scripts"))
+sys.path.insert(0, str(REPO_ROOT / "strategies" / "config"))
 sys.path.insert(0, str(REPO_ROOT / "strategies" / "scripts"))
 sys.path.insert(0, str(REPO_ROOT / "strategies" / "utils"))
 sys.path.insert(0, str(REPO_ROOT / "strategies"))
 
 from fyers_client import FyersAuthError, FyersClient  # noqa: E402
+from order_config import (  # noqa: E402
+    ConfigGatedFyersClient,
+    get_entry_qty,
+    get_stop_loss_percent,
+    get_trailing_stop_loss_percent,
+)
 from fyers_symbols import load_master  # noqa: E402
 from common_indicators import ema, rsi, hma  # noqa: E402
 from excel_logger import log_to_excel  # noqa: E402
@@ -45,7 +52,7 @@ from excel_logger import log_to_excel  # noqa: E402
 LIVE = True
 MARKET_TIMEZONE = ZoneInfo("Asia/Kolkata")
 MARKET_OPEN = dt.time(9, 15)
-MARKET_CLOSE = dt.time(15, 15)
+MARKET_CLOSE = dt.time(15, 30)
 POLL_SECONDS = 300  # 5 minutes
 
 STRATEGIES_DIR = SCRIPT_DIR.parent
@@ -54,13 +61,11 @@ POSITIONS_PATH = STRATEGIES_DIR / "data" / "index_rejection_positions.json"
 ENTERED_PATH = STRATEGIES_DIR / "data" / "index_rejection_entered.json"
 LOG_PATH = STRATEGIES_DIR / "logs" / "index_rejection_strategy.log"
 
-STOP_LOSS_POINTS = 15  # 15 points stop loss
-
-ENTRY_ORDER_TYPE = 20  # MARKET
+ENTRY_ORDER_TYPE = 1  # LIMIT
 ENTRY_PRODUCT_TYPE = "INTRADAY"
-ENTRY_QTY = 10
-MAX_ORDERS_PER_DAY = 3  # Maximum orders per day
 STRATEGY_NAME = "INDEX_REJECTION_STRATEGY"
+SCRIPT_NAME = "IndexRejectionStrategy.py"
+LIMIT_BUFFER_PERCENT = 0.10  # 10% of candle range for limit order buffer
 
 # Rejection is tested at 26 ema for nifty and sensex
 # Rejection is tested at 35 ema for BankNifty
@@ -430,7 +435,9 @@ def clear_entered_on_new_day() -> None:
 
 
 def monitor_stop_loss(client: FyersClient, limiter: 'ApiRateLimiter') -> None:
-    """Check open positions and exit if stop loss is hit."""
+    """Exit tracked positions when the configured fixed or trailing stop hits."""
+    stop_loss_percent = get_stop_loss_percent(SCRIPT_NAME)
+    trailing_stop_percent = get_trailing_stop_loss_percent(SCRIPT_NAME)
     positions = load_positions()
     if not positions:
         return
@@ -443,7 +450,8 @@ def monitor_stop_loss(client: FyersClient, limiter: 'ApiRateLimiter') -> None:
 
     for pos_id, pos_data in list(positions.items()):
         symbol = pos_data.get("symbol")
-        entry_price = pos_data.get("entry_price", 0)
+        entry_price = float(pos_data.get("entry_price", 0) or 0)
+        highest_ltp = float(pos_data.get("highest_ltp", entry_price) or entry_price)
 
         for live_pos in live_positions:
             live_symbol = live_pos.get("symbol") or live_pos.get("symbolName")
@@ -454,29 +462,42 @@ def monitor_stop_loss(client: FyersClient, limiter: 'ApiRateLimiter') -> None:
                     quote_response = limiter.call(client.quotes, [symbol])
                     if quote_response.get("s") == "ok":
                         quote_data = quote_response.get("d", [{}])[0].get("v", {})
-                        ltp = quote_data.get("lp", 0)
+                        ltp = float(quote_data.get("lp", 0) or 0)
+
+                        if ltp > highest_ltp:
+                            highest_ltp = ltp
+                            pos_data["highest_ltp"] = highest_ltp
+                            save_positions(positions)
 
                         if ltp > 0 and entry_price > 0:
+                            fixed_stop = entry_price * (1 - stop_loss_percent)
+                            trailing_stop = highest_ltp * (1 - trailing_stop_percent)
+                            stop_price = max(fixed_stop, trailing_stop)
                             pnl = ltp - entry_price
-                            if pnl <= -STOP_LOSS_POINTS:
-                                log_message(f"STOP_LOSS_HIT: {symbol} entry={entry_price} ltp={ltp} pnl={pnl:.2f}")
-                                exit_position(client, symbol, net_qty, limiter, pos_id)
+                            if ltp <= stop_price:
+                                log_message(
+                                    f"STOP_LOSS_HIT: {symbol} entry={entry_price} ltp={ltp} "
+                                    f"highest={highest_ltp} stop={stop_price:.2f} pnl={pnl:.2f}"
+                                )
+                                exit_position(client, symbol, net_qty, limiter, pos_id, ltp)
                 except Exception as e:
                     log_error(f"QUOTE_ERROR {symbol}: {e}")
 
 
 def exit_position(client: FyersClient, symbol: str, qty: int,
-                  limiter: 'ApiRateLimiter', pos_id: str) -> None:
+                  limiter: 'ApiRateLimiter', pos_id: str, ltp: float = 0) -> None:
     """Exit position at market price."""
+    buffer = ltp * 0.02  # 2% buffer for exit
     order = {
         "symbol": symbol,
         "qty": qty,
-        "type": 20,
+        "type": 1,
         "side": -1,
         "productType": "INTRADAY",
+        "limitPrice": ltp + buffer,
         "orderTag": "stop_loss_exit",
     }
-    meta = {"strategy": STRATEGY_NAME, "signal": "EXIT", "description": f"Index rejection stop loss exit for {symbol}"}
+    meta = {"strategy": STRATEGY_NAME, "signal": "EXIT", "description": f"Index rejection stop loss exit for {symbol}, buffer={buffer:.2f}"}
     log_message(f"EXIT_ORDER: {json.dumps(order, sort_keys=True)}")
     response = limiter.call(client.place_order, order, dry_run=not LIVE, meta=meta)
 
@@ -522,15 +543,17 @@ def close_all_positions(client: FyersClient, limiter: 'ApiRateLimiter') -> None:
                     pnl = ltp - entry_price if ltp > 0 and entry_price > 0 else 0
                     log_message(f"CLOSING: {symbol} entry={entry_price} ltp={ltp} pnl={pnl:.2f} qty={net_qty}")
 
+                    buffer = ltp * 0.02  # 2% buffer for exit
                     order = {
                         "symbol": symbol,
                         "qty": net_qty,
-                        "type": 20,
+                        "type": 1,
                         "side": -1,
                         "productType": "INTRADAY",
+                        "limitPrice": ltp + buffer,
                         "orderTag": "manual_close_all",
                     }
-                    meta = {"strategy": STRATEGY_NAME, "signal": "CLOSE_ALL", "description": f"Manual close all for {symbol}"}
+                    meta = {"strategy": STRATEGY_NAME, "signal": "CLOSE_ALL", "description": f"Manual close all for {symbol}, buffer={buffer:.2f}"}
                     log_message(f"EXIT_ORDER: {json.dumps(order, sort_keys=True)}")
                     response = limiter.call(client.place_order, order, dry_run=not LIVE, meta=meta)
 
@@ -596,15 +619,17 @@ def close_opposite_positions(client: FyersClient, index_name: str, signal: str,
                         log_message(f"OPPOSITE_SIGNAL_CLOSE: {index_name} signal={signal} | "
                                     f"closing {pos_option_type} {symbol} entry={entry_price} ltp={ltp} pnl={pnl:.2f}")
 
+                        buffer = ltp * 0.02  # 2% buffer for exit
                         order = {
                             "symbol": symbol,
                             "qty": net_qty,
-                            "type": 20,
+                            "type": 1,
                             "side": -1,
                             "productType": "INTRADAY",
+                            "limitPrice": ltp + buffer,
                             "orderTag": f"opposite_signal_{signal.lower()}",
                         }
-                        meta = {"strategy": STRATEGY_NAME, "signal": "OPPOSITE_SIGNAL_EXIT", "description": f"Opposite signal exit for {symbol} due to {signal}"}
+                        meta = {"strategy": STRATEGY_NAME, "signal": "OPPOSITE_SIGNAL_EXIT", "description": f"Opposite signal exit for {symbol} due to {signal}, buffer={buffer:.2f}"}
                         log_message(f"EXIT_ORDER: {json.dumps(order, sort_keys=True)}")
                         response = limiter.call(client.place_order, order, dry_run=not LIVE, meta=meta)
 
@@ -619,13 +644,10 @@ def close_opposite_positions(client: FyersClient, index_name: str, signal: str,
 
 
 def enter_position(client: FyersClient, index_name: str, option_type: str,
-                   ltp: float, limiter: 'ApiRateLimiter', entered: set) -> None:
+                   ltp: float, limiter: 'ApiRateLimiter', entered: set,
+                   candle_range: float = 0) -> None:
     """Enter new position."""
     SCRIPT_NAME = "IndexRejectionStrategy.py"
-    if len(entered) >= MAX_ORDERS_PER_DAY:
-        log_message(f"ENTRY_SKIP: Max orders ({MAX_ORDERS_PER_DAY}) reached for today")
-        log_to_excel(STRATEGY_NAME, SCRIPT_NAME, index_name, "SIGNAL_MATCH", "SKIPPED", details="Max orders reached")
-        return
     result = get_atm_option_symbol(client, limiter, index_name, option_type, ltp)
     if not result:
         log_error(f"NO_OPTION: {index_name} {option_type}")
@@ -633,7 +655,7 @@ def enter_position(client: FyersClient, index_name: str, option_type: str,
         return
 
     option_symbol, lot_size = result
-    order_qty = ENTRY_QTY * lot_size
+    order_qty = get_entry_qty(SCRIPT_NAME) * lot_size
 
     positions_data = load_positions()
     for pos_data in positions_data.values():
@@ -654,15 +676,17 @@ def enter_position(client: FyersClient, index_name: str, option_type: str,
     except Exception as e:
         log_error(f"POSITION_CHECK_ERROR: {e}")
 
+    buffer = candle_range * LIMIT_BUFFER_PERCENT
     order = {
         "symbol": option_symbol,
         "qty": order_qty,
         "type": ENTRY_ORDER_TYPE,
         "side": 1,
         "productType": ENTRY_PRODUCT_TYPE,
+        "limitPrice": ltp - buffer,
         "orderTag": f"index_rejection_{option_type.lower()}",
     }
-    meta = {"strategy": STRATEGY_NAME, "signal": f"ENTRY_{option_type}", "description": f"Index rejection {option_type} entry for {index_name} at LTP {ltp}"}
+    meta = {"strategy": STRATEGY_NAME, "signal": f"ENTRY_{option_type}", "description": f"Index rejection {option_type} entry for {index_name} at LTP {ltp}, buffer={buffer:.2f}"}
     log_message(f"ENTRY_ORDER: {json.dumps(order, sort_keys=True)}")
     response = limiter.call(client.place_order, order, dry_run=not LIVE, meta=meta)
     order_id = response.get("id") or response.get("id_fyers", "not_returned")
@@ -679,6 +703,7 @@ def enter_position(client: FyersClient, index_name: str, option_type: str,
             "option_type": option_type,
             "qty": order_qty,
             "order_id": order_id,
+            "highest_ltp": ltp,
         }
         save_positions(positions_data)
         log_message(f"ENTRY_SUCCESS: {index_name} {option_symbol} qty={order_qty}")
@@ -756,19 +781,21 @@ def exit_position_if_hma_cross(client: FyersClient, index_name: str,
                     live_symbol = live_pos.get("symbol") or live_pos.get("symbolName")
                     net_qty = int(live_pos.get("netQty", 0))
                     if live_symbol == pos_symbol and net_qty != 0:
+                        buffer = ltp * 0.02  # 2% buffer for exit
                         order = {
                             "symbol": pos_symbol,
                             "qty": abs(net_qty),
-                            "type": 20,
+                            "type": 1,
                             "side": -1,
                             "productType": ENTRY_PRODUCT_TYPE,
+                            "limitPrice": ltp + buffer,
                             "orderTag": "hma21_exit",
                         }
                         if option_type == "CE":
                             exit_reason = f"close={current_close} < HMA21={current_hma:.2f}"
                         else:
                             exit_reason = f"Bullish candle: open={current_open} >= HMA21={current_hma:.2f}, close={current_close} > open, upper_wick={upper_wick:.2f} < body={body:.2f}"
-                        meta = {"strategy": STRATEGY_NAME, "signal": "EXIT", "description": f"HMA21 {option_type} exit for {index_name}, {exit_reason}"}
+                        meta = {"strategy": STRATEGY_NAME, "signal": "EXIT", "description": f"HMA21 {option_type} exit for {index_name}, {exit_reason}, buffer={buffer:.2f}"}
                         log_message(f"HMA_EXIT_ORDER: {json.dumps(order, sort_keys=True)}")
                         response = limiter.call(client.place_order, order, dry_run=not live, meta=meta)
                         order_id = response.get("id") or response.get("id_fyers", "not_returned")
@@ -779,6 +806,154 @@ def exit_position_if_hma_cross(client: FyersClient, index_name: str,
                         return
             except Exception as e:
                 log_error(f"HMA_EXIT_ERROR: {index_name} {e}")
+
+
+# =============================================================================
+# Candle Pattern Exit Condition
+# =============================================================================
+def candle_pattern_exit_check(client: FyersClient, limiter: 'ApiRateLimiter',
+                               candles_15min: list, live: bool) -> None:
+    """Exit positions based on candle pattern reversal conditions.
+
+    Bearish exit (for CE positions):
+      - Current candle opens below previous candle's close (gap down)
+      - OR current candle open = high (pure bearish, no upper wick)
+      Stoploss reference: previous candle's high
+
+    Bullish exit (for PE positions):
+      - Current candle opens above previous candle's close (gap up)
+      - OR current candle open = low (pure bullish, no lower wick)
+      Stoploss reference: previous candle's low
+    """
+    if len(candles_15min) < 2:
+        return
+
+    today = dt.date.today()
+    today_candles = []
+    for c in candles_15min:
+        candle_dt = dt.datetime.fromtimestamp(c.epoch, MARKET_TIMEZONE)
+        if candle_dt.date() == today:
+            today_candles.append(c)
+
+    if len(today_candles) < 2:
+        return
+
+    curr_candle = today_candles[-1]
+    prev_candle = today_candles[-2]
+
+    curr_open = curr_candle.open
+    curr_high = curr_candle.high
+    curr_low = curr_candle.low
+    prev_close = prev_candle.close
+    prev_high = prev_candle.high
+    prev_low = prev_candle.low
+
+    # Detect bearish conditions
+    bearish_gap_down = curr_open < prev_close
+    bearish_open_eq_high = curr_open == curr_high
+
+    # Detect bullish conditions
+    bullish_gap_up = curr_open > prev_close
+    bullish_open_eq_low = curr_open == curr_low
+
+    if not (bearish_gap_down or bearish_open_eq_high or bullish_gap_up or bullish_open_eq_low):
+        return
+
+    positions = load_positions()
+    if not positions:
+        return
+
+    try:
+        live_positions = limiter.call(client.positions).get("netPositions", [])
+    except Exception as e:
+        log_error(f"CANDLE_PATTERN_EXIT_POSITIONS_ERROR: {e}")
+        return
+
+    for pos_id, pos_data in list(positions.items()):
+        symbol = pos_data.get("symbol")
+        option_type = pos_data.get("option_type", "CE")
+
+        # --- CE exit: bearish candle pattern ---
+        if option_type == "CE" and (bearish_gap_down or bearish_open_eq_high):
+            stop_ref = prev_high
+            for live_pos in live_positions:
+                live_symbol = live_pos.get("symbol") or live_pos.get("symbolName")
+                net_qty = int(live_pos.get("netQty", 0))
+                if live_symbol == symbol and net_qty != 0:
+                    try:
+                        quote_response = limiter.call(client.quotes, [symbol])
+                        if quote_response.get("s") == "ok":
+                            quote_data = quote_response.get("d", [{}])[0].get("v", {})
+                            ltp = quote_data.get("lp", 0)
+                            if ltp <= 0:
+                                continue
+
+                            if bearish_gap_down:
+                                reason = f"GAP_DOWN: open={curr_open} < prev_close={prev_close}, prev_high={stop_ref}"
+                            else:
+                                reason = f"OPEN_EQ_HIGH: open={curr_open} = high={curr_high}, prev_high={stop_ref}"
+
+                            log_message(f"CANDLE_PATTERN_EXIT[CE]: {symbol} {reason} - EXITING")
+                            order = {
+                                "symbol": symbol,
+                                "qty": abs(net_qty),
+                                "type": 1,
+                                "side": -1,
+                                "productType": ENTRY_PRODUCT_TYPE,
+                                "limitPrice": ltp,
+                                "orderTag": "candle_pattern_ce_exit",
+                            }
+                            meta = {"strategy": STRATEGY_NAME, "signal": "CANDLE_PATTERN_EXIT",
+                                    "description": f"CE exit: {reason}"}
+                            response = limiter.call(client.place_order, order, dry_run=not live,
+                                                     meta=meta)
+                            log_message(f"CANDLE_PATTERN_EXIT_ORDER: {symbol} response={response}")
+                            del positions[pos_id]
+                            save_positions(positions)
+                            return
+                    except Exception as e:
+                        log_error(f"CANDLE_PATTERN_EXIT_ERROR: {symbol} {e}")
+
+        # --- PE exit: bullish candle pattern ---
+        if option_type == "PE" and (bullish_gap_up or bullish_open_eq_low):
+            stop_ref = prev_low
+            for live_pos in live_positions:
+                live_symbol = live_pos.get("symbol") or live_pos.get("symbolName")
+                net_qty = int(live_pos.get("netQty", 0))
+                if live_symbol == symbol and net_qty != 0:
+                    try:
+                        quote_response = limiter.call(client.quotes, [symbol])
+                        if quote_response.get("s") == "ok":
+                            quote_data = quote_response.get("d", [{}])[0].get("v", {})
+                            ltp = quote_data.get("lp", 0)
+                            if ltp <= 0:
+                                continue
+
+                            if bullish_gap_up:
+                                reason = f"GAP_UP: open={curr_open} > prev_close={prev_close}, prev_low={stop_ref}"
+                            else:
+                                reason = f"OPEN_EQ_LOW: open={curr_open} = low={curr_low}, prev_low={stop_ref}"
+
+                            log_message(f"CANDLE_PATTERN_EXIT[PE]: {symbol} {reason} - EXITING")
+                            order = {
+                                "symbol": symbol,
+                                "qty": abs(net_qty),
+                                "type": 1,
+                                "side": -1,
+                                "productType": ENTRY_PRODUCT_TYPE,
+                                "limitPrice": ltp,
+                                "orderTag": "candle_pattern_pe_exit",
+                            }
+                            meta = {"strategy": STRATEGY_NAME, "signal": "CANDLE_PATTERN_EXIT",
+                                    "description": f"PE exit: {reason}"}
+                            response = limiter.call(client.place_order, order, dry_run=not live,
+                                                     meta=meta)
+                            log_message(f"CANDLE_PATTERN_EXIT_ORDER: {symbol} response={response}")
+                            del positions[pos_id]
+                            save_positions(positions)
+                            return
+                    except Exception as e:
+                        log_error(f"CANDLE_PATTERN_EXIT_ERROR: {symbol} {e}")
 
 
 def main() -> int:
@@ -795,7 +970,10 @@ def main() -> int:
     clear_entered_on_new_day()
 
     try:
-        client = FyersClient()
+        client = ConfigGatedFyersClient(
+            strategy_name=STRATEGY_NAME,
+            script_name=SCRIPT_NAME,
+        )
         limiter = ApiRateLimiter()
 
         # Close all positions if --close flag is provided
@@ -807,14 +985,15 @@ def main() -> int:
         entered = load_entered()
         log_message(f"STARTED [{STRATEGY_NAME}]: indices={list(INDEX_CONFIG.keys())}, interval={POLL_SECONDS}s, "
                     f"market={MARKET_OPEN}-{MARKET_CLOSE} IST, "
-                    f"already_entered={len(entered)}, stop_loss={STOP_LOSS_POINTS} points")
+                    f"already_entered={len(entered)}, stop_loss={get_stop_loss_percent(SCRIPT_NAME):.2%}, "
+                    f"trailing_stop={get_trailing_stop_loss_percent(SCRIPT_NAME):.2%}")
 
         with sqlite3.connect(DATABASE_PATH_15MIN) as conn_15min:
             while market_open():
                 now = dt.datetime.now(MARKET_TIMEZONE)
                 log_message(f"FETCH_CYCLE: {now.isoformat(timespec='seconds')}")
 
-                # Auto-close positions at 15:10 (5 min before market close)
+                # Auto-close positions at 15:10 (20 min before the 15:30 close)
                 if now.time() >= dt.time(15, 10):
                     log_message("AUTO_CLOSE: Market closing soon, closing all positions")
                     close_all_positions(client, limiter)
@@ -833,6 +1012,8 @@ def main() -> int:
                             cache_candles(conn_15min, table_15m, candles_15min)
                             # Check HMA(21) exit on 15-min candles
                             exit_position_if_hma_cross(client, index_name, candles_15min, live, limiter)
+                            # Check candle pattern exit conditions
+                            candle_pattern_exit_check(client, limiter, candles_15min, live)
 
                         cached_candles = get_cached_candles(conn_15min, table_15m)
                         if len(cached_candles) < 5:
@@ -843,6 +1024,7 @@ def main() -> int:
                         if signal != "NONE":
                             log_message(f"SIGNAL_{signal}: {index_name}")
                             ltp = cached_candles[-1].close
+                            candle_range = details.get('curr_high', 0) - details.get('curr_low', 0)
 
                             # Close opposite positions first
                             close_opposite_positions(client, index_name, signal, limiter, entered)
@@ -850,7 +1032,7 @@ def main() -> int:
                             # Enter new position if not already holding
                             if index_name not in entered:
                                 option_type = CE_OPTION_TYPE if signal == "CE" else PE_OPTION_TYPE
-                                enter_position(client, index_name, option_type, ltp, limiter, entered)
+                                enter_position(client, index_name, option_type, ltp, limiter, entered, candle_range)
 
                     except (RuntimeError, ValueError) as error:
                         log_error(f"{index_name}: {error}")

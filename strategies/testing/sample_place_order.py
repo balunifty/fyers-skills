@@ -15,12 +15,14 @@ from zoneinfo import ZoneInfo
 SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[1]
 LOG_PATH = SCRIPT_DIR.parent / "logs" / "sample_place_order.log"
-DEFAULT_QTY = 1
 PRICE_TICK = 0.05
 MARKET_TIMEZONE = ZoneInfo("Asia/Kolkata")
 MARKET_OPEN = dt_time(9, 15)
 LAST_INTRADAY_ENTRY = dt_time(15, 20)
 sys.path.insert(0, str(REPO_ROOT / "skills" / "fyers-trading" / "scripts"))
+sys.path.insert(0, str(REPO_ROOT / "strategies" / "config"))
+
+from order_config import ConfigGatedFyersClient, get_entry_qty  # noqa: E402
 
 _client_spec = importlib.util.spec_from_file_location(
     "fyers_client", REPO_ROOT / "skills" / "fyers-trading" / "scripts" / "fyers_client.py"
@@ -29,7 +31,10 @@ assert _client_spec and _client_spec.loader
 _client_module = importlib.util.module_from_spec(_client_spec)
 sys.modules[_client_spec.name] = _client_module
 _client_spec.loader.exec_module(_client_module)
-FyersAuthError, FyersClient = _client_module.FyersAuthError, _client_module.FyersClient
+FyersAuthError = _client_module.FyersAuthError
+FyersClient = ConfigGatedFyersClient
+SCRIPT_NAME = "EquitySamplePlaceOrder.py"
+DEFAULT_QTY = get_entry_qty(SCRIPT_NAME)
 
 
 def quote_price(client: FyersClient, symbol: str) -> tuple[float, float]:
@@ -97,7 +102,10 @@ def main() -> int:
                 "FYERS would reject this MIS order after system square-off"
             )
             return 0
-        client = FyersClient()
+        client = FyersClient(
+            strategy_name="sample_place_order",
+            script_name=SCRIPT_NAME,
+        )
         symbols = [line.strip() for line in args.stocks.read_text(encoding="utf-8").splitlines()
                    if line.strip() and not line.lstrip().startswith("#")]
         if not symbols:

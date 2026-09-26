@@ -26,6 +26,7 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "strategies"))
 sys.path.insert(0, str(REPO_ROOT / "strategies" / "utils"))
 sys.path.insert(0, str(REPO_ROOT / "skills" / "fyers-trading" / "scripts"))
+sys.path.insert(0, str(STRATEGIES_DIR / "config"))
 sys.path.insert(0, str(SCRIPT_DIR))
 
 _indicator_spec = importlib.util.spec_from_file_location(
@@ -38,6 +39,7 @@ adx = _indicator_module.adx
 ema, hma, wma = _indicator_module.ema, _indicator_module.hma, _indicator_module.wma
 rsi = _indicator_module.rsi
 from fyers_client import FyersAuthError, FyersClient  # noqa: E402
+from order_config import ConfigGatedFyersClient, get_entry_qty  # noqa: E402
 from shared_data_fetcher import SharedDataFetcher  # noqa: E402
 from excel_logger import log_to_excel  # noqa: E402
 
@@ -45,24 +47,24 @@ STOCKS_PATH = STRATEGIES_DIR / "data" / "Nifty50.txt"
 DATABASE_PATH = STRATEGIES_DIR / "databases" / "nifty50_5min.db"
 ENTERED_PATH = STRATEGIES_DIR / "data" / "entered_ema10_50.json"
 STRATEGY_NAME = "EMA_10_CROSSOVER_50_5MIN"
+SCRIPT_NAME = "BuyCallOptionEma10_50Crossover.py"
 
 # --- Tuning constants --------------------------------------------------------
 LIVE = True                          # True = send real orders
 SKIP_MARKET_HOURS = False             # True = run outside market hours (test mode)
 FORCE_ENTRY = False                   # True = place test order ignoring signal (test mode)
-POLL_SECONDS = 30                    # test: 30s (prod: 5 * 60)
+POLL_SECONDS = 300                  # 5 minutes
 HISTORY_DAYS = 10                    # calendar days of candle history to fetch
 MARKET_TIMEZONE = ZoneInfo("Asia/Kolkata")
 MARKET_OPEN = dt.time(9, 15)
-MARKET_CLOSE = dt.time(15, 45)
+MARKET_CLOSE = dt.time(15, 30)
 MAX_API_CALLS_PER_SECOND = 8
-ENTRY_QTY = 10                         # number of lots per entry (lot size fetched from master)
-ENTRY_ORDER_TYPE = 2                  # 1=Limit 2=Market
+ENTRY_ORDER_TYPE = 1                  # 1=Limit 2=Market
 ENTRY_PRODUCT_TYPE = "INTRADAY"       # INTRADAY | CNC | MARGIN
 RSI_ENTRY_THRESHOLD = 55
 STRIKE_STEP = 50                      # default, overridden dynamically per stock
 OPTION_TYPE = "CE"                    # CE for buy/bullish signals
-MAX_ORDERS_PER_DAY = 3                # Maximum orders per day
+LIMIT_BUFFER_PERCENT = 0.10           # 10% of candle range for limit order buffer
 # --------------------------------------------------------------------------------
 
 
@@ -455,15 +457,10 @@ def enter_position_if_triggered(client: FyersClient, symbol: str,
     Skips if:
       - Symbol was already entered today (persisted to disk)
       - There's an existing open position for this stock
-      - Max orders per day reached
       - Market is bearish (NIFTY50 below EMA20)
     """
     SCRIPT_NAME = "BuyCallOptionEma10_50Crossover.py"
     if symbol in entered:
-        return
-    if len(entered) >= MAX_ORDERS_PER_DAY:
-        log_message(f"ENTRY_SKIP: Max orders ({MAX_ORDERS_PER_DAY}) reached for today")
-        log_to_excel(STRATEGY_NAME, SCRIPT_NAME, symbol, "SIGNAL_MATCH", "SKIPPED", details="Max orders reached")
         return
     if shared_fetcher and is_market_bearish(shared_fetcher):
         log_message(f"ENTRY_SKIP: {symbol} - market is bearish, skipping CE entry")
@@ -487,13 +484,14 @@ def enter_position_if_triggered(client: FyersClient, symbol: str,
     log_signal(symbol, "EMA10_EMA50_ENTRY", details)
 
     ltp = candles[-1].close
+    candle_range = candles[-1].high - candles[-1].low
     result = resolve_atm_option(client, symbol, ltp, limiter)
     if not result:
         log_error(f"ENTRY_ABORT: {symbol} - could not resolve ATM option for ltp={ltp}")
         log_to_excel(STRATEGY_NAME, SCRIPT_NAME, symbol, "SIGNAL_MATCH", "FAILED", details=f"ATM resolve failed, LTP={ltp}")
         return
     option_symbol, lot_size = result
-    order_qty = ENTRY_QTY * lot_size
+    order_qty = get_entry_qty(SCRIPT_NAME) * lot_size
 
     # Double-check: don't place if already holding this specific option
     positions = limiter.call(client.positions).get("netPositions", [])
@@ -507,12 +505,14 @@ def enter_position_if_triggered(client: FyersClient, symbol: str,
             save_entered(entered)
             return
 
+    buffer = candle_range * LIMIT_BUFFER_PERCENT
     order = {
         "symbol": option_symbol,
         "qty": order_qty,
         "type": ENTRY_ORDER_TYPE,
         "side": 1,
         "productType": ENTRY_PRODUCT_TYPE,
+        "limitPrice": ltp - buffer,
         "orderTag": "ema1050",
     }
     meta = {"strategy": STRATEGY_NAME, "signal": "ENTRY", "description": f"EMA 10/50 crossover entry for {symbol} at LTP {ltp}"}
@@ -552,12 +552,14 @@ def exit_position_if_hma_cross(client: FyersClient, symbol: str,
             pos_symbol = pos.get("symbol") or pos.get("symbolName")
             net_qty = int(pos.get("netQty", 0))
             if pos_symbol == symbol and net_qty != 0:
+                buffer = ltp * 0.02  # 2% buffer for exit
                 order = {
                     "symbol": pos_symbol,
                     "qty": abs(net_qty),
-                    "type": 2,
+                    "type": 1,
                     "side": -1,
                     "productType": ENTRY_PRODUCT_TYPE,
+                    "limitPrice": ltp + buffer,
                     "orderTag": "hma21_exit",
                 }
                 meta = {"strategy": STRATEGY_NAME, "signal": "EXIT", "description": f"HMA21 exit for {symbol}, close={current_close} < HMA21={current_hma:.2f}"}
@@ -586,7 +588,10 @@ def main() -> int:
         if not symbols:
             raise ValueError(f"no symbols found in {STOCKS_PATH}")
         DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        client = FyersClient()
+        client = ConfigGatedFyersClient(
+            strategy_name=STRATEGY_NAME,
+            script_name=SCRIPT_NAME,
+        )
         limiter = ApiRateLimiter()
         entered = load_entered()
         shared_fetcher = SharedDataFetcher()

@@ -30,15 +30,23 @@ import urllib.parse
 import urllib.request
 
 try:
-    from .fyers_login import API_BASE, USER_AGENT, load_token  # when imported as a package
+    from .fyers_login import API_BASE, USER_AGENT, load_token, auto_refresh_token  # when imported as a package
 except ImportError:  # when run as a script
-    from fyers_login import API_BASE, USER_AGENT, load_token
+    from fyers_login import API_BASE, USER_AGENT, load_token, auto_refresh_token
 
 DATA_BASE = "https://api-t1.fyers.in/data"
 
 
 class FyersAuthError(RuntimeError):
     """Raised when the token is missing/expired — caller should re-login."""
+
+
+class AmbiguousOrderError(RuntimeError):
+    """Raised when a non-idempotent order POST may have reached FYERS.
+
+    Callers must reconcile the broker orderbook instead of automatically
+    retrying the same write.
+    """
 
 
 class FyersClient:
@@ -52,8 +60,10 @@ class FyersClient:
         self.access_token = tok["access_token"]
         self.max_retries = max_retries
 
-    # --- core request with auth + 429 backoff ---------------------------------
-    def _request(self, method: str, url: str, payload: dict | None = None) -> dict:
+    # --- core request with auth + 429 backoff + auto-refresh on 401 --------
+    def _request(self, method: str, url: str, payload: dict | None = None,
+                 _retried_after_refresh: bool = False,
+                 retry_transient: bool = True) -> dict:
         headers = {
             "Authorization": f"{self.app_id}:{self.access_token}",
             "Content-Type": "application/json",
@@ -67,11 +77,26 @@ class FyersClient:
                 with urllib.request.urlopen(req, timeout=30) as resp:
                     return json.loads(resp.read().decode())
             except urllib.error.HTTPError as e:
+                if e.code == 401 and not _retried_after_refresh:
+                    # Token may have expired mid-session — try refresh once
+                    try:
+                        refreshed = auto_refresh_token()
+                    except Exception:
+                        refreshed = None
+                    if refreshed and refreshed.get("access_token"):
+                        self.access_token = refreshed["access_token"]
+                        headers["Authorization"] = f"{self.app_id}:{self.access_token}"
+                        _retried_after_refresh = True
+                        continue
+                    raise FyersAuthError(
+                        "401 Unauthorized — token expired and refresh failed. "
+                        "Re-run fyers_login.py"
+                    ) from e
                 if e.code == 401:
                     raise FyersAuthError(
                         "401 Unauthorized — token expired. Re-run fyers_login.py"
                     ) from e
-                if e.code == 429 and attempt < self.max_retries:
+                if e.code == 429 and retry_transient and attempt < self.max_retries:
                     retry_ms = e.headers.get("X-Retry-After-Ms")
                     retry_s = e.headers.get("Retry-After")
                     delay = (
@@ -82,18 +107,25 @@ class FyersClient:
                     time.sleep(delay)
                     attempt += 1
                     continue
-                if 500 <= e.code < 600 and attempt < self.max_retries:
-                    time.sleep(2 ** attempt)
-                    attempt += 1
-                    continue
+                if 500 <= e.code < 600:
+                    body = e.read().decode(errors="ignore")
+                    if retry_transient and attempt < self.max_retries:
+                        time.sleep(2 ** attempt)
+                        attempt += 1
+                        continue
+                    raise AmbiguousOrderError(
+                        f"HTTP {e.code} on {method} {url}: {body}"
+                    ) from e
                 body = e.read().decode(errors="ignore")
                 raise RuntimeError(f"HTTP {e.code} on {method} {url}: {body}") from e
             except (urllib.error.URLError, OSError, ConnectionError) as e:
-                if attempt < self.max_retries:
+                if retry_transient and attempt < self.max_retries:
                     time.sleep(2 ** attempt)
                     attempt += 1
                     continue
-                raise RuntimeError(f"Network error on {method} {url}: {e}") from e
+                raise AmbiguousOrderError(
+                    f"Network error on {method} {url}: {e}"
+                ) from e
 
     def _get(self, url: str) -> dict:
         return self._request("GET", url)
@@ -149,7 +181,9 @@ class FyersClient:
 
     # --- orders (SAFE: dry-run by default) ------------------------------------
     def place_order(self, order: dict, dry_run: bool = True,
-                    validate_symbol: bool = True, meta: dict | None = None) -> dict:
+                    validate_symbol: bool = True, meta: dict | None = None,
+                    gap_threshold_pct: float | None = None,
+                    retry_transient: bool = True) -> dict:
         """Place a regular order. dry_run=True (default) only logs the payload.
 
         Set dry_run=False to actually transmit — do this only with explicit user
@@ -159,11 +193,72 @@ class FyersClient:
         symbol master BEFORE the order is built/sent, catching typos and stale
         expiries that would otherwise fail live with code -300. This runs for
         dry-run too, so a dry-run faithfully proves the symbol is real.
+
+        gap_threshold_pct: If set, blocks the order when the NIFTY gap exceeds
+        this percentage (default 0.5% if None and gap check enabled). Pass 0
+        to explicitly disable gap protection for this order.
+
+        retry_transient: Retry HTTP 429/5xx and network failures. Set False for
+        live order writes when the caller uses broker-order reconciliation;
+        ambiguous failures then raise AmbiguousOrderError and are never resent
+        automatically.
         """
         required = {"symbol", "qty", "type", "side", "productType"}
         missing = required - order.keys()
         if missing:
             raise ValueError(f"order missing required fields: {sorted(missing)}")
+
+        # --- gap protection (before symbol validation — cheap check first) ---
+        if gap_threshold_pct is not None and gap_threshold_pct > 0:
+            try:
+                from .helper import is_significant_gap
+            except ImportError:
+                from helper import is_significant_gap
+            try:
+                from .fyers_symbols import load_master
+            except ImportError:
+                from fyers_symbols import load_master
+
+            # Fetch NIFTY index quote to detect gap
+            try:
+                nifty_symbols = ["NSE:NIFTY不上-INDEX", "NSE:NIFTY不上"]
+                for ns in nifty_symbols:
+                    qresp = self.quotes([ns])
+                    if qresp.get("s") == "ok":
+                        for item in qresp.get("d", []):
+                            v = item.get("v", {})
+                            prev_close = v.get("prev_close", 0)
+                            open_price = v.get("open", 0)
+                            if prev_close > 0 and open_price > 0:
+                                gap_pct = ((open_price - prev_close) / prev_close) * 100.0
+                                if is_significant_gap(gap_pct, gap_threshold_pct):
+                                    direction = "UP" if gap_pct > 0 else "DOWN"
+                                    reason = (
+                                        f"NIFTY gap {direction} {abs(gap_pct):.2f}% "
+                                        f"(open={open_price}, prev_close={prev_close}) "
+                                        f"exceeds threshold {gap_threshold_pct}%"
+                                    )
+                                    if meta is None:
+                                        meta = {}
+                                    meta["gap_blocked"] = True
+                                    meta["gap_reason"] = reason
+                                    if dry_run:
+                                        print(f"[DRY-RUN] GAP BLOCKED: {reason}")
+                                    else:
+                                        print(f"GAP BLOCKED: {reason}")
+                                    result = {
+                                        "s": "blocked", "code": -999,
+                                        "message": reason, "order": order,
+                                    }
+                                    try:
+                                        from .trade_logger import log_order
+                                    except ImportError:
+                                        from trade_logger import log_order
+                                    log_order(order, result, dry_run=dry_run, meta=meta)
+                                    return result
+                        break  # got a response, no need to try other symbols
+            except Exception:
+                pass  # gap check is best-effort; don't block on fetch failure
 
         if validate_symbol:
             try:
@@ -200,7 +295,15 @@ class FyersClient:
             return result
 
         try:
-            result = self._request("POST", f"{API_BASE}/orders/sync", order)
+            if retry_transient:
+                result = self._request("POST", f"{API_BASE}/orders/sync", order)
+            else:
+                result = self._request(
+                    "POST",
+                    f"{API_BASE}/orders/sync",
+                    order,
+                    retry_transient=False,
+                )
         except Exception as exc:
             try:
                 from .trade_logger import log_order

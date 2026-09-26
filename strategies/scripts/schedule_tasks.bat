@@ -1,6 +1,6 @@
 @echo off
 REM =============================================================================
-REM Schedule F&O Trading Scripts - Market Hours (9:15 AM to 3:00 PM)
+REM Schedule F&O Trading Scripts - Market Hours (9:15 AM to 3:15 PM)
 REM Run as Administrator: Right-click > Run as administrator
 REM =============================================================================
 
@@ -14,6 +14,7 @@ schtasks /delete /tn "FO_SharedDataFetcher" /f 2>nul
 schtasks /delete /tn "FO_OrbStrategy" /f 2>nul
 schtasks /delete /tn "FO_BuyCallEMA_10_20_30" /f 2>nul
 schtasks /delete /tn "FO_BuyCallEMA_10_50" /f 2>nul
+schtasks /delete /tn "FO_RuleAgent" /f 2>nul
 
 echo.
 echo Creating scheduled tasks (running as current user)...
@@ -37,6 +38,10 @@ if %errorLevel% neq 0 echo ERROR: Failed to create FO_BuyCallEMA_10_20_30
 REM Task 5: BuyCallOption EMA 10/50 - Runs every 5 minutes
 schtasks /create /tn "FO_BuyCallEMA_10_50" /tr "\"%PYTHON%\" \"%WORKDIR%\strategies\scripts\BuyCallOptionEma10_50Crossover.py\" --live" /sc minute /mo 5 /st 09:15 /et 15:00 /f
 if %errorLevel% neq 0 echo ERROR: Failed to create FO_BuyCallEMA_10_50
+
+REM Task 6: Rule Agent - Runs every 5 minutes
+schtasks /create /tn "FO_RuleAgent" /tr "\"%PYTHON%\" \"%WORKDIR%\strategies\agent\rule_agent.py\" --scan" /sc minute /mo 5 /st 09:15 /et 15:00 /f
+if %errorLevel% neq 0 echo ERROR: Failed to create FO_RuleAgent
 
 echo.
 echo ============================================================

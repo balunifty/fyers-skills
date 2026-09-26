@@ -305,7 +305,7 @@ Always be conservative and confirm before executing trades.
         """Check if market is currently open."""
         now = dt.datetime.now(MARKET_TIMEZONE)
         market_open = dt.time(9, 15)
-        market_close = dt.time(15, 15)
+        market_close = dt.time(15, 30)
         return now.weekday() < 5 and market_open <= now.time() <= market_close
 
     # -------------------------------------------------------------------------

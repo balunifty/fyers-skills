@@ -1,12 +1,17 @@
 {
-  "version": "1.0",
-  "last_updated": "2026-09-14",
+  "version": "2.0",
+  "last_updated": "2026-09-26",
   "strategies": [
     {
       "id": "STRAT_001",
       "name": "ORB Breakout",
       "type": "BREAKOUT",
-      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY", "STOCKS"],
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
       "timeframe": "5min",
       "entry_rules": {
         "CE": {
@@ -28,13 +33,23 @@
         "orb_time": "09:15-09:30",
         "max_positions": 1
       },
-      "confidence": 0.75
+      "confidence": 0.75,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": "ORB",
+      "engine_support": "not_wired",
+      "engine_blocker": "the engine's fetcher returns 15-minute candles, so the chain's 6-bar opening range would span 90 minutes rather than the 30 this 5-minute strategy is defined over"
     },
     {
       "id": "STRAT_002",
       "name": "ORB Rejection",
       "type": "REVERSAL",
-      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY", "STOCKS"],
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
       "timeframe": "15min",
       "entry_rules": {
         "PE": {
@@ -55,13 +70,23 @@
         "min_volume": 100000,
         "confirmation_candles": 1
       },
-      "confidence": 0.70
+      "confidence": 0.7,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": "ORB High Rej",
+      "engine_support": "not_wired",
+      "engine_blocker": "no engine branch; the ORB rejection logic lives in OrbStrategyCallPut.py and is not reachable from here"
     },
     {
       "id": "STRAT_003",
       "name": "Double Top Rejection",
       "type": "REVERSAL",
-      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY", "STOCKS"],
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
       "timeframe": "15min",
       "entry_rules": {
         "PE": {
@@ -78,13 +103,23 @@
         "min_candles": 5,
         "hma_period": 21
       },
-      "confidence": 0.65
+      "confidence": 0.65,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": null,
+      "engine_support": "not_wired",
+      "engine_blocker": "no engine branch; the double top logic is not implemented in the engine"
     },
     {
       "id": "STRAT_004",
       "name": "Double Bottom Rejection",
       "type": "REVERSAL",
-      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY", "STOCKS"],
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
       "timeframe": "15min",
       "entry_rules": {
         "CE": {
@@ -101,13 +136,23 @@
         "min_candles": 5,
         "hma_period": 21
       },
-      "confidence": 0.65
+      "confidence": 0.65,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": null,
+      "engine_support": "not_wired",
+      "engine_blocker": "no engine branch; the double bottom logic is not implemented in the engine"
     },
     {
       "id": "STRAT_005",
       "name": "EMA Crossover with RSI",
       "type": "TREND_FOLLOWING",
-      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY", "STOCKS"],
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
       "timeframe": "15min",
       "entry_rules": {
         "CE": {
@@ -126,13 +171,20 @@
         "rsi_period": 14,
         "rsi_threshold": 55
       },
-      "confidence": 0.72
+      "confidence": 0.72,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": null,
+      "engine_support": "wired"
     },
     {
       "id": "STRAT_006",
       "name": "Index Rejection - NIFTY/SENSEX",
       "type": "REVERSAL",
-      "instruments": ["NIFTY", "SENSEX"],
+      "instruments": [
+        "NIFTY",
+        "SENSEX"
+      ],
       "timeframe": "15min",
       "entry_rules": {
         "PE": {
@@ -153,13 +205,20 @@
         "support_ema": 9,
         "rsi_period": 14
       },
-      "confidence": 0.75
+      "confidence": 0.75,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": "Index rejection",
+      "engine_support": "wired",
+      "engine_note": "evaluated correctly, but only if an index symbol is scanned; SharedDataFetcher.get_stocks returns the FNO Top 100 stocks only"
     },
     {
       "id": "STRAT_007",
       "name": "Index Rejection - BANKNIFTY",
       "type": "REVERSAL",
-      "instruments": ["BANKNIFTY"],
+      "instruments": [
+        "BANKNIFTY"
+      ],
       "timeframe": "15min",
       "entry_rules": {
         "PE": {
@@ -180,13 +239,22 @@
         "support_ema": 9,
         "rsi_period": 14
       },
-      "confidence": 0.75
+      "confidence": 0.75,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": "Index rejection",
+      "engine_support": "wired",
+      "engine_note": "evaluated correctly, but only if an index symbol is scanned; SharedDataFetcher.get_stocks returns the FNO Top 100 stocks only"
     },
     {
       "id": "STRAT_008",
       "name": "EMA 10/20/30 Crossover",
       "type": "TREND_FOLLOWING",
-      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY"],
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY"
+      ],
       "timeframe": "5min",
       "entry_rules": {
         "CE": {
@@ -200,17 +268,30 @@
         "trailing_stop": false
       },
       "filters": {
-        "ema_periods": [10, 20, 30],
+        "ema_periods": [
+          10,
+          20,
+          30
+        ],
         "rsi_period": 14,
         "rsi_threshold": 55
       },
-      "confidence": 0.70
+      "confidence": 0.7,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": "ema:10-20-30",
+      "engine_support": "not_wired",
+      "engine_blocker": "the engine's fetcher returns 15-minute candles, so the chain evaluates this on a different series than the 5-minute column it describes"
     },
     {
       "id": "STRAT_009",
       "name": "EMA 10/50 Crossover",
       "type": "TREND_FOLLOWING",
-      "instruments": ["NIFTY", "SENSEX", "BANKNIFTY"],
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY"
+      ],
       "timeframe": "5min",
       "entry_rules": {
         "CE": {
@@ -229,7 +310,696 @@
         "rsi_period": 14,
         "rsi_threshold": 55
       },
+      "confidence": 0.68,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": null,
+      "engine_support": "not_wired",
+      "engine_blocker": "the engine's fetcher returns 15-minute candles, so the chain evaluates this on a different series than the 5-minute column it describes"
+    },
+    {
+      "id": "STRAT_10",
+      "name": "Second Candle Breakout",
+      "type": "BREAKOUT",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "entry_rules": {
+        "CE": {
+          "condition": "If 2nd candle (9:30) bullish: subsequent candle high > 2nd candle high. If 2nd candle bearish: 3rd candle (9:45) close > 2nd candle open.",
+          "description": "Buy Call on second candle breakout"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_points": 15,
+        "trailing_stop_points": 3
+      },
+      "filters": {
+        "candles_required": 3,
+        "second_candle_time": "09:30",
+        "third_candle_time": "09:45"
+      },
+      "confidence": 0.75,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": "SecondCandle",
+      "engine_support": "wired",
+      "engine_note": "the engine evaluates the CE side only; the PE side lives in the bearish-reversal evaluator and is not reached from here"
+    },
+    {
+      "id": "STRAT_11",
+      "name": "Bearish Reversal - Two Bullish Candles",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "entry_rules": {
+        "PE": {
+          "condition": "1st candle (9:15) bullish AND 2nd candle (9:30) bullish AND 3rd candle (9:45) close < 2nd candle high AND (upper_wick > body OR close < open OR high < 2nd high)",
+          "description": "Buy Put when two bullish candles followed by weak third candle"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_points": 15,
+        "trailing_stop_points": 3
+      },
+      "filters": {
+        "candles_required": 3,
+        "first_candle_time": "09:15",
+        "second_candle_time": "09:30",
+        "third_candle_time": "09:45"
+      },
+      "confidence": 0.72,
+      "source": null,
+      "evaluator": null,
+      "dashboard_column": null,
+      "engine_support": "wired"
+    },
+    {
+      "id": "STRAT_012",
+      "name": "EMA 10/20 cross + stacked-state signals",
+      "type": "TREND_FOLLOWING",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityEma10_20_Signals15min.py",
+      "evaluator": "ema10_ema20_signal",
+      "dashboard_column": "ema10:20 signals",
+      "engine_support": "wired",
+      "entry_rules": {
+        "BUY": {
+          "condition": "ema10 crosses above ema20",
+          "description": "Fresh bullish 10-over-20 crossing on the judged bar"
+        },
+        "PE": {
+          "condition": "ema10 crosses below ema20",
+          "description": "Fresh bearish 10-under-20 crossing on the judged bar"
+        },
+        "SELL": {
+          "condition": "(ema10 < ema20 < ema30 AND close < ema10) OR (ema10 < ema20 < ema50 AND close < ema10)",
+          "description": "Bearish stacked state with the close under ema10. A state, not an event, so it holds while true."
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "ema_fast": 10,
+        "ema_slow": 20,
+        "stack_ema": [
+          30,
+          50
+        ]
+      },
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_013",
+      "name": "Lower High + close below previous close",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityLowerHighCloseSignal15min.py",
+      "evaluator": "lower_high_close_sell_signal",
+      "dashboard_column": "LH",
+      "engine_support": "wired",
+      "entry_rules": {
+        "PE": {
+          "condition": "high < previous bar's high AND close < previous bar's close",
+          "description": "Lower high with the close under the prior close"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "bars_required": 2
+      },
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_014",
+      "name": "EMA 15/10/20/50 fresh crossover",
+      "type": "TREND_FOLLOWING",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityEma15_10_20_50Crossover15min.py",
+      "evaluator": "evaluate_fresh_crossover",
+      "dashboard_column": "ema15:10-20-50 crossover",
+      "engine_support": "wired",
+      "entry_rules": {
+        "CE": {
+          "condition": "close crosses above ema15 AND close > ema10 AND ema10 crosses above ema20 AND ema20 crosses above ema50 AND the previous bar was not already ema10>ema20>ema50",
+          "description": "A fresh bullish alignment off ema15, not a continuation"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "ema_periods": [
+          10,
+          15,
+          20,
+          50
+        ]
+      },
+      "confidence": 0.72
+    },
+    {
+      "id": "STRAT_015",
+      "name": "EMA10 bullish pullback / up-cross",
+      "type": "TREND_FOLLOWING",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityEma15_10_20_50Crossover15min.py",
+      "evaluator": "evaluate_ema10_pullback_cross",
+      "dashboard_column": "EMA10 pullback",
+      "engine_support": "wired",
+      "entry_rules": {
+        "CE": {
+          "condition": "previous close < ema10 AND current close > ema10 AND the close did not cross from above to below ema10 AND ema10 > ema20 AND ema20 > ema50",
+          "description": "Pullback into ema10 that closes back above it, inside a bullish stack"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "ema_periods": [
+          10,
+          20,
+          50
+        ]
+      },
+      "confidence": 0.72
+    },
+    {
+      "id": "STRAT_016",
+      "name": "Doji rejection at the previous doji's low",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "R1PrevHighRejectionStrategy.py",
+      "evaluator": "doji_rejection_signal",
+      "dashboard_column": "Doji rejection",
+      "engine_support": "wired",
+      "entry_rules": {
+        "PE": {
+          "condition": "previous bar is a doji AND the current bar closes below the previous doji's low",
+          "description": "Bearish rejection of the prior doji"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "doji_body_ratio": 0.1
+      },
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_017",
+      "name": "Higher high, then close below the previous bar's low",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "R1PrevHighRejectionStrategy.py",
+      "evaluator": "higher_high_low_rejection_signal",
+      "dashboard_column": "HigherHigh rej",
+      "engine_support": "wired",
+      "entry_rules": {
+        "PE": {
+          "condition": "current high > previous high AND current close < previous low",
+          "description": "A higher high that fails all the way below the prior low"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "bars_required": 2
+      },
+      "confidence": 0.72
+    },
+    {
+      "id": "STRAT_018",
+      "name": "Higher high, then close below the previous bar's close",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "R1PrevHighRejectionStrategy.py",
+      "evaluator": "higher_high_close_rejection_signal",
+      "dashboard_column": "HH vs Close",
+      "engine_support": "wired",
+      "entry_rules": {
+        "PE": {
+          "condition": "current high > previous high AND current close < previous close",
+          "description": "A higher high that fails back under the prior close"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "bars_required": 2
+      },
+      "confidence": 0.72
+    },
+    {
+      "id": "STRAT_019",
+      "name": "Open candle EMA stack (buy + ema10<ema20<ema50 sell)",
+      "type": "TREND_FOLLOWING",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityOpenCandleEmaStackBuy15min.py",
+      "evaluator": "open_candle_ema_stack_buy_signal",
+      "dashboard_column": "Open EMA stack",
+      "engine_support": "not_wired",
+      "engine_blocker": "needs a daily series for the previous session's high; SharedDataFetcher.get_candles returns 15-minute candles only",
+      "entry_rules": {
+        "see_source": "read EquityOpenCandleEmaStackBuy15min.py::open_candle_ema_stack_buy_signal"
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {},
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_020",
+      "name": "ORB second candle above the previous day's high (buy)",
+      "type": "BREAKOUT",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityOpenRangeOpeningSignals15min.py",
+      "evaluator": "second_candle_prev_high_buy_signal",
+      "dashboard_column": "ORB",
+      "engine_support": "not_wired",
+      "engine_blocker": "needs a daily series for the previous session's high",
+      "entry_rules": {
+        "see_source": "read EquityOpenRangeOpeningSignals15min.py::second_candle_prev_high_buy_signal"
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {},
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_021",
+      "name": "ORB first candle gap down below the previous close (sell)",
+      "type": "BREAKALLOW",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityOpenRangeOpeningSignals15min.py",
+      "evaluator": "first_candle_gap_down_sell_signal",
+      "dashboard_column": "ORB",
+      "engine_support": "not_wired",
+      "engine_blocker": "needs a daily series for the previous session's close",
+      "entry_rules": {
+        "see_source": "read EquityOpenRangeOpeningSignals15min.py::first_candle_gap_down_sell_signal"
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {},
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_022",
+      "name": "ORB first candle small body (sell)",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityOpenRangeOpeningSignals15min.py",
+      "evaluator": "first_candle_small_body_sell_signal",
+      "dashboard_column": "ORB",
+      "engine_support": "not_wired",
+      "engine_blocker": "wired as a rule but not yet reachable: the agent's fetch path has no session-anchored entry point",
+      "entry_rules": {
+        "see_source": "read EquityOpenRangeOpeningSignals15min.py::first_candle_small_body_sell_signal"
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {},
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_023",
+      "name": "Rejection / bounce at R1 (classic pivot 2P-L)",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "OrbStrategyCallPut.py",
+      "evaluator": "level_rejection_signal(kind='r1')",
+      "dashboard_column": "R1 rejection",
+      "engine_support": "not_wired",
+      "engine_blocker": "needs a daily series for the previous session's high, low and close",
+      "entry_rules": {
+        "see_source": "read OrbStrategyCallPut.py::level_rejection_signal(kind='r1')"
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {},
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_024",
+      "name": "Rejection / bounce at the previous trading day's high",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "OrbStrategyCallPut.py",
+      "evaluator": "level_rejection_signal(kind='prev_high')",
+      "dashboard_column": "PDH Rejection",
+      "engine_support": "not_wired",
+      "engine_blocker": "needs a daily series for the previous session's high",
+      "entry_rules": {
+        "see_source": "read OrbStrategyCallPut.py::level_rejection_signal(kind='prev_high')"
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {},
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_025",
+      "name": "ORB breakout / rejection + double top/bottom + EMA/RSI",
+      "type": "BREAKOUT",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "5min",
+      "source": "OrbStrategyCallPut.py",
+      "evaluator": "multiple evaluators",
+      "dashboard_column": "ORB",
+      "engine_support": "not_wired",
+      "engine_blocker": "needs 5-minute bars for the breakout half; the agent has 15-minute only",
+      "entry_rules": {
+        "see_source": "read OrbStrategyCallPut.py::multiple evaluators"
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {},
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_026",
+      "name": "Daily breakout + RSI / volume",
+      "type": "BREAKOUT",
+      "instruments": [
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityDailyBreakoutRsiVolume15min.py",
+      "evaluator": "evaluate_strategy",
+      "dashboard_column": "Daily breakout",
+      "engine_support": "not_wired",
+      "engine_blocker": "needs a daily series alongside the intraday one",
+      "entry_rules": {
+        "see_source": "read EquityDailyBreakoutRsiVolume15min.py::evaluate_strategy"
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {},
+      "confidence": 0.7
+    },
+    {
+      "id": "STRAT_027",
+      "name": "Index rejection (NIFTY / SENSEX / BANKNIFTY)",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY"
+      ],
+      "timeframe": "15min",
+      "source": "IndexRejectionStrategy.py",
+      "evaluator": "index_rejection_signal",
+      "dashboard_column": "Index rejection",
+      "engine_support": "not_wired",
+      "engine_blocker": "its fetch_candles uses a stale history() signature and is broken; it also needs index series the agent does not collect",
+      "entry_rules": {
+        "see_source": "read IndexRejectionStrategy.py::index_rejection_signal"
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {},
       "confidence": 0.68
+    },
+    {
+      "id": "STRAT_028",
+      "name": "Second candle bearish reversal, behind the sell gate",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "SecondCandleBreakout.py + SecondCandleSellGate15min.py",
+      "evaluator": "bearish_reversal_signal, then second_candle_sell_gate",
+      "dashboard_column": "SecondCandle",
+      "engine_support": "not_wired",
+      "engine_blocker": "the sell gate needs a daily series for the previous session's high, which the fetcher does not provide; the gate deliberately fails open, so wiring it without that series would let every sell through unchecked",
+      "entry_rules": {
+        "PE": {
+          "condition": "1st and 2nd candles bullish AND 3rd candle closes below the 2nd candle's high AND weakness, AND the close is below the previous day's high or below ema10",
+          "description": "The gate holds the sell back unless price is weak"
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "first_candle_time": "09:15",
+        "second_candle_time": "09:30",
+        "third_candle_time": "09:45"
+      },
+      "confidence": 0.72
+    },
+    {
+      "id": "STRAT_029",
+      "name": "Bullish rejection at the opening-range low",
+      "type": "REVERSAL",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityOrbLowRejectionSignal15min.py",
+      "evaluator": "orb_low_rejection_buy_signal",
+      "dashboard_column": "ORB Low Rej",
+      "engine_support": "wired",
+      "entry_rules": {
+        "CE": {
+          "condition": "the session's 09:15 candle is bullish AND a later 15-minute candle's low <= the opening range low AND its close > the opening range low AND close > open",
+          "description": "A dip into the opening range low that fails to hold, under a session that opened with buyers. The judged bar must come after 09:15, because the opening candle defines the range rather than rejecting it."
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "opening_candle_time": "09:15",
+        "opening_range": "the 09:15 candle's own high and low",
+        "low_tested": "low <= opening range low",
+        "recovery": "close > opening range low (strict)",
+        "judged_candle_bullish": "close > open (strict)"
+      },
+      "confidence": 0.72
+    },
+    {
+      "id": "STRAT_030",
+      "name": "Double Bottom - 15-minute candle closed above its open",
+      "type": "TREND_FOLLOWING",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityDoubleBottomBullishSignal15min.py",
+      "evaluator": "double_bottom_bullish_signal",
+      "dashboard_column": "Double Bottom",
+      "engine_support": "wired",
+      "entry_rules": {
+        "CE": {
+          "condition": "close > open AND ( low <= the previous trading day's low AND close > it  OR  low <= the opening-range low AND close > it )",
+          "description": "Buyers closed the candle in control and it rejected a level: it traded at or below the level and closed back above. Either level is enough. Strictly greater, so a doji is not a signal. Much looser than the ORB double bottom, which also wants the close above HMA(21), the low to test the intraday low so far, and RSI trending up."
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "candle": "a 15-minute bar of the judged session",
+        "test": "close > open (strict)",
+        "rejection": "low <= level AND close > level, at either the previous trading day's low or the session's 09:15 low",
+        "opening_range_low": "the 09:15 candle's own low",
+        "judged_bar": "must come after the 09:15 candle, which defines the range low rather than rejecting it",
+        "note": "the dashboard column is judged on every 15-minute bar of the session and shows the newest bar that fired, so an intraday signal is reported at its own time. The agent evaluates only the newest bar, because its fetcher returns one series at a time."
+      },
+      "confidence": 0.65,
+      "engine_note": "only the opening-range leg is live here. SharedDataFetcher.get_candles returns 15-minute candles and no daily series, so the previous trading day's low is unavailable and the evaluator reports that leg as untested rather than as a pass. Signals from this id are therefore narrower than the dashboard's same-named column. The agent also judges a single bar, not the whole session."
+    },
+    {
+      "id": "STRAT_031",
+      "name": "ORB second candle gaps below the first close and closes under ema10",
+      "type": "BREAKALLOW",
+      "instruments": [
+        "NIFTY",
+        "SENSEX",
+        "BANKNIFTY",
+        "STOCKS"
+      ],
+      "timeframe": "15min",
+      "source": "EquityOpenRangeOpeningSignals15min.py",
+      "evaluator": "second_candle_gap_ema_sell_signal",
+      "dashboard_column": "ORB",
+      "engine_support": "wired",
+      "entry_rules": {
+        "PE": {
+          "condition": "the session's second 15-minute candle opens below the first candle's close AND that candle closes below ema10",
+          "description": "A gap down between the two opening candles that leaves price under its own ten-period average. The gap is measured from the first candle's close, not its open: against the open the test is much weaker, and against its low no symbol in the last session's universe fired. Strict on both counts."
+        }
+      },
+      "exit_rules": {
+        "stop_loss_percent": 15,
+        "take_profit_percent": null,
+        "trailing_stop": false
+      },
+      "filters": {
+        "candles": "the session's 09:15 and 09:30 candles",
+        "gap_reference": "the first candle's close",
+        "average": "ema10 over the whole 15-minute history, so it carries the sessions before today",
+        "insufficient_history": "with no ema10 the rule declines to judge rather than judging on a short average"
+      },
+      "confidence": 0.7
     }
   ],
   "risk_management": {
@@ -247,10 +1017,27 @@
   },
   "instruments": {
     "indices": {
-      "NIFTY": {"symbol": "NSE:NIFTY50-INDEX", "lot_size": 50, "strike_step": 50},
-      "SENSEX": {"symbol": "BSE:SENSEX-INDEX", "lot_size": 15, "strike_step": 100},
-      "BANKNIFTY": {"symbol": "NSE:NIFTYBANK-INDEX", "lot_size": 15, "strike_step": 100}
+      "NIFTY": {
+        "symbol": "NSE:NIFTY50-INDEX",
+        "qty": 1,
+        "strike_step": 65
+      },
+      "SENSEX": {
+        "symbol": "BSE:SENSEX-INDEX",
+        "qty": 1,
+        "strike_step": 20
+      },
+      "BANKNIFTY": {
+        "symbol": "NSE:NIFTYBANK-INDEX",
+        "qty": 1,
+        "strike_step": 30
+      }
     },
     "stock_list_file": "NiftyFNOTop100.txt"
+  },
+  "engine_notes": {
+    "dispatch": "rule_agent.StrategyEngine delegates the 7 engine_support='wired' strategies to the same source files the dashboard uses, so there is one implementation of each rule.",
+    "candle_limit": "SharedDataFetcher.get_candles returns 15-minute candles only. A strategy that needs a daily series or 5-minute bars cannot be evaluated here yet, and is marked engine_support='not_wired' with a reason.",
+    "confidence_note": "Confidence gates alerting at 0.7 in process_signals."
   }
 }
