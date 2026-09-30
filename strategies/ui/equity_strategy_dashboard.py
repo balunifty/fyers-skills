@@ -2050,11 +2050,11 @@ INDEX_HTML = r"""<!doctype html>
   --sell: #f43f5e;
   --sell-bg: rgba(244, 63, 94, .14);
   --when: #ffffff;
-  /* Column header text. Yellow against the dark surface, with a paler yellow
-     for hover. The active sort keeps the blue accent so it is still tellable
-     apart from the rest. */
-  --header: #facc15;
-  --header-hover: #fef08a;
+  /* Column header text: pure white, at 17:1 against --surface-2. There is no
+     hover shade, because white is already the top of the range - the hover
+     affordance is carried by the background shift instead. The active sort
+     keeps the blue accent so it is still tellable apart from the rest. */
+  --header: #ffffff;
 }
 * { box-sizing: border-box; }
 body {
@@ -2199,7 +2199,10 @@ thead th {
   border-bottom: 1px solid var(--line);
   overflow-wrap: break-word; hyphens: auto;
 }
-thead th.col-stock { width: 13%; padding: 5px 6px 6px 10px; }
+/* Width is fitted to the longest symbol on screen by fitStockColumn(); this is
+   only the fallback before the first render. The search box shares this cell,
+   which is what sets the floor - see STOCK_COL_MIN. */
+thead th.col-stock { width: 11%; padding: 5px 6px 6px 10px; }
 thead th.col-price { width: 7%; }
 thead th.col-chg { width: 7%; }
 thead th.col-vol { width: 9%; }
@@ -2207,7 +2210,9 @@ thead th.left { text-align: left; padding-left: 10px; }
 /* A sortable header behaves like a button: it says so on hover, on focus and
    while it is the active sort. */
 thead th.sortable { cursor: pointer; user-select: none; }
-thead th.sortable:hover { color: var(--header-hover); background: var(--surface); }
+/* The header is already pure white, so a hover cannot brighten the text any
+   further. The background shift carries the affordance on its own. */
+thead th.sortable:hover { background: var(--surface); }
 thead th.sortable:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 thead th.sortable.sorted { color: var(--accent); }
 thead th .arrow { display: block; font-size: 11px; line-height: 1; }
@@ -2390,6 +2395,41 @@ function beginCooldown() {
 function restoreCooldown() {
   const allowedAt = Number(localStorage.getItem(REFRESH_ALLOWED_KEY) || 0);
   if (allowedAt > Date.now()) applyCooldown(allowedAt);
+}
+
+/* ---------- symbol display ---------- */
+/* A FYERS symbol carries its exchange as a prefix: NSE:HDFCBANK-EQ. The prefix
+   is needed to fetch history, but in a table where every stock is NSE anyway it
+   is noise, and it was the widest thing in the column. Stripped for display
+   only - the row keeps the full symbol, so search still matches either form
+   (typing "HDFC" or "NSE:HDFC" both work) and sorting still orders by the real
+   symbol rather than the tidied one. */
+const EXCHANGE_PREFIX = /^[A-Z]{3}:/;
+function displaySymbol(symbol) {
+  return String(symbol ?? '').replace(EXCHANGE_PREFIX, '');
+}
+
+/* Size the Stock column to the longest symbol actually on screen, so a tab of
+   three indices does not carry a column sized for a hundred long stock names.
+   Measured over the whole tab rather than the visible rows, so the column does
+   not jump about while the search box is being typed into.
+
+   The search box shares this cell, and that sets the floor: it needs room for
+   its own 41px of padding plus enough text to read, so below about 150px it
+   stops being worth using and the column would be actively worse for being
+   tight. */
+const STOCK_COL_MIN = 150;
+const STOCK_COL_MAX = 240;
+function fitStockColumn(rows) {
+  const head = tableWrap.querySelector('th.col-stock');
+  if (!head) return;
+  let longest = 0;
+  (rows || []).forEach(row => {
+    longest = Math.max(longest, displaySymbol(row.symbol).length);
+  });
+  // 7.6px per character at the .sym size, plus the cell's own padding.
+  const wanted = Math.round(longest * 7.6) + 22;
+  head.style.width = Math.min(STOCK_COL_MAX, Math.max(STOCK_COL_MIN, wanted)) + 'px';
 }
 
 /* ---------- row filtering ---------- */
@@ -2587,7 +2627,7 @@ function render(result) {
     '<th class="left col-stock"><span class="col-label">Stock' + countHtml +
     '</span><span class="searchslot"></span></th>' +
     '<th class="col-price">Price<span class="unit">' + priceUnit + '</span></th>' +
-    sortHeaderLabel('col-chg', 'gain', 'Total gain', 'day open&rarr;close') +
+    sortHeaderLabel('col-chg', 'gain', 'gain%', 'day open&rarr;close') +
     sortHeaderLabel('col-vol', 'volume', 'Volume', volUnit) +
     columns.map(c => '<th class="sig-col" title="' + esc(c.label) + '">' +
       esc(c.column) + '</th>').join('') +
@@ -2617,7 +2657,8 @@ function render(result) {
       const gainClass = gain > 0 ? 'up' : (gain < 0 ? 'down' : '');
       const states = rowStates(row);
       html += '<tr' + (states.any ? ' class="has-signal"' : '') + '>' +
-        '<td class="left"><span class="sym">' + esc(row.symbol) + '</span></td>' +
+        '<td class="left"><span class="sym">' + esc(displaySymbol(row.symbol)) +
+        '</span></td>' +
         '<td class="num">' + Number(row.close).toFixed(2) + '</td>' +
         '<td class="num ' + gainClass + '">' + (gain > 0 ? '+' : '') + gain.toFixed(2) + '%</td>' +
         '<td class="num">' + Number(row.volume_15m).toLocaleString('en-IN') + '</td>' +
@@ -2626,6 +2667,10 @@ function render(result) {
     });
   }
   tableWrap.innerHTML = html + '</tbody></table>';
+
+  /* After the header exists, so the width lands on the real cell. Measured
+     over the tab's rows, not the filtered ones. */
+  fitStockColumn(view.rows);
 
   /* Move the live search node into the freshly built header. Moving the same
      node keeps its value and button state; only the focus needs restoring. */

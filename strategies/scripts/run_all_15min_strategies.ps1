@@ -81,7 +81,11 @@ function Get-NextQuarterHourSlot {
 }
 
 if ([string]::IsNullOrWhiteSpace($Python)) {
-    $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+    # Prefer pythonw.exe (windowless) to avoid a console flash on every tick.
+    $pythonCommand = Get-Command pythonw -ErrorAction SilentlyContinue
+    if ($null -eq $pythonCommand) {
+        $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+    }
     if ($null -eq $pythonCommand) {
         throw "Python was not found. Pass -Python with the full python.exe path."
     }

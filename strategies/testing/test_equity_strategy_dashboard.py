@@ -430,6 +430,151 @@ class EodTabTests(unittest.TestCase):
         )
 
 
+class SymbolDisplayTests(unittest.TestCase):
+    """The exchange prefix is display-only, and the column is fitted to it.
+
+    NSE:HDFCBANK-EQ is what the API needs, but the prefix was the widest thing
+    in the Stock column and told the reader nothing - every stock in the table
+    is NSE. Stripping it is only safe if the row keeps the real symbol, so these
+    check that search and sort still work off the full form.
+    """
+
+    @staticmethod
+    def _script():
+        return ScriptSyntaxTests._script()
+
+    def test_the_prefix_is_stripped_at_render_time(self):
+        script = self._script()
+        self.assertIn("function displaySymbol(symbol)", script)
+        self.assertIn("const EXCHANGE_PREFIX = /^[A-Z]{3}:/;", script)
+        # The cell must go through it...
+        self.assertIn("esc(displaySymbol(row.symbol))", script)
+        # ...and the row itself must not be rewritten.
+        self.assertNotIn("row.symbol =", script)
+
+    def test_sorting_still_reads_the_full_symbol(self):
+        """Sorting on the tidied name would be a behaviour change."""
+        script = self._script()
+        self.assertIn("symbol: row => String(row.symbol || ''),", script)
+
+    def test_search_still_matches_either_form(self):
+        """Typing "HDFC" or "NSE:HDFC" must both find the row."""
+        script = self._script()
+        self.assertIn("row.symbol.toLowerCase().includes(needle)", script)
+        # So the prefix is not stripped before the search runs.
+        self.assertNotIn("displaySymbol(row.symbol).toLowerCase()", script)
+
+    def test_the_column_width_is_fitted_to_the_longest_symbol(self):
+        script = self._script()
+        self.assertIn("function fitStockColumn(rows)", script)
+        self.assertIn("fitStockColumn(view.rows);", script)
+        # Over the whole tab, so typing in the search box cannot resize it.
+        self.assertIn("displaySymbol(row.symbol).length", script)
+
+    def test_the_width_is_floored_so_the_search_box_stays_usable(self):
+        """The search box shares this cell, so too tight is worse than loose."""
+        script = self._script()
+        self.assertIn("const STOCK_COL_MIN = 150;", script)
+        self.assertIn("const STOCK_COL_MAX = 240;", script)
+        self.assertIn(
+            "Math.min(STOCK_COL_MAX, Math.max(STOCK_COL_MIN, wanted))", script)
+
+    def test_the_stylesheet_only_carries_a_fallback_width(self):
+        """The search box is width:100%, so the cell must be able to shrink."""
+        html = dashboard.INDEX_HTML
+        self.assertIn("thead th.col-stock { width: 11%;", html)
+
+
+class SymbolStripNodeTests(unittest.TestCase):
+    """displaySymbol and fitStockColumn, driven through node against real markup."""
+
+    @staticmethod
+    def _script():
+        return ScriptSyntaxTests._script()
+
+    PAYLOAD = {
+        "selection": "all", "columns": [{"key": "k", "column": "X", "label": "x"}],
+        "errors": [],
+        "views": {"intraday": {
+            "id": "intraday", "title": "t", "columns": [{"key": "k", "column": "X",
+                                                        "label": "x"}],
+            "rows": [
+                {"symbol": "NSE:MOTHERSON-EQ", "group": "stock", "close": 1.0,
+                 "total_gain_percent": 1.0, "volume_15m": 1, "signal_count": 0,
+                 "cells": {"k": dashboard.empty_cell()}},
+                {"symbol": "BSE:SENSEX-INDEX", "group": "index", "close": 2.0,
+                 "total_gain_percent": 2.0, "volume_15m": 2, "signal_count": 0,
+                 "cells": {"k": dashboard.empty_cell()}},
+            ],
+            "total_rows": 2, "signal_rows": 0, "single_group": False,
+            "latest_message": "m", "market_open": False,
+            "as_of_label": "l", "sell_only": False,
+        }},
+    }
+
+    def _run(self, body):
+        node = ScriptSyntaxTests._node()
+        if node is None:
+            self.skipTest("node is not installed")
+        driver = (
+            "const markup = " + json.dumps(dashboard.INDEX_HTML) + ";\n"
+            "const payload = " + json.dumps(self.PAYLOAD) + ";\n"
+            + SearchMountTests.SHIM
+            + self._script()
+            + "\n(async () => {\n"
+            "  for (let i = 0; i < 8; i++) await new Promise(r => setImmediate(r));\n"
+            + body
+            + "})();\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "sym.js"
+            path.write_text(driver, encoding="utf-8")
+            result = subprocess.run([node, str(path)], capture_output=True,
+                                    text=True, timeout=90)
+        self.assertEqual(result.returncode, 0, result.stderr[-800:])
+        return json.loads(result.stdout)
+
+    def test_the_rendered_symbols_carry_no_exchange_prefix(self):
+        out = self._run(
+            "  const box = doc.getElementById('tablewrap');\n"
+            "  const shown = (box.innerHTML.match(/<span class=.sym.>([^<]*)<"
+            "\\/span>/g) || []).map(s => s.replace(/<[^>]*>/g, ''));\n"
+            "  process.stdout.write(JSON.stringify(shown));\n"
+        )
+        self.assertEqual(out, ["MOTHERSON-EQ", "SENSEX-INDEX"])
+
+    def test_a_long_symbol_widens_the_column_past_the_floor(self):
+        out = self._run(
+            "  const head = doc.querySelector('th.col-stock');\n"
+            "  process.stdout.write(JSON.stringify({w: head.style.width}));\n"
+        )
+        width = int(out["w"].rstrip("px"))
+        # 12 characters at 7.6px plus padding, so under the cap.
+        self.assertGreaterEqual(width, 150)
+        self.assertLessEqual(width, 240)
+
+    def test_short_symbols_do_not_shrink_below_the_floor(self):
+        out = self._run(
+            "  const head = doc.querySelector('th.col-stock');\n"
+            "  const real = head.style.width;\n"
+            "  fitStockColumn([{symbol: 'NSE:A-EQ'}, {symbol: 'NSE:B-EQ'}]);\n"
+            "  const short = head.style.width;\n"
+            "  // A deliberately long symbol, longer than any real FNO name, to\n"
+            "  // show the fitter responds to length rather than being a constant.\n"
+            "  fitStockColumn([{symbol: 'NSE:A-VERY-LONG-SYMBOL-NAME-EQ'}]);\n"
+            "  process.stdout.write(JSON.stringify({short: short, real: real,\n"
+            "    long: head.style.width}));\n"
+        )
+        # Five-character symbols would ask for ~60px, so the floor wins and the
+        # search box sharing this cell keeps enough room to be usable.
+        self.assertEqual(out["short"], "150px")
+        # Real FNO names are 11-14 characters, which also lands on the floor.
+        self.assertEqual(out["real"], "150px")
+        # But the fitter is not a constant: a long enough name widens it.
+        self.assertGreater(int(out["long"].rstrip("px")), 150)
+        self.assertLessEqual(int(out["long"].rstrip("px")), 240)
+
+
 class SignalMappingTests(unittest.TestCase):
     def test_option_signals_map_to_buy_and_sell(self):
         self.assertEqual(dashboard.signal_state("CE"), "BUY")
@@ -2194,14 +2339,24 @@ class TotalGainTests(unittest.TestCase):
     def test_no_candles_means_no_session_open(self):
         self.assertIsNone(dashboard.session_open([]))
 
-    def test_the_column_is_labelled_as_a_total(self):
+    def test_the_column_is_labelled_as_a_percentage(self):
+        """Shortened to gain% at the user's request.
+
+        The header cell is uppercased by the stylesheet, so it reads GAIN%, like
+        every other header in the table. The subtitle still spells out what the
+        figure is measured over, which is the part worth keeping.
+        """
         html = dashboard.INDEX_HTML
-        self.assertIn("Total gain", html)
+        self.assertIn("'gain%'", html)
+        self.assertNotIn("'Total gain'", html)
         self.assertIn("day open&rarr;close", html)
         self.assertNotIn(">Chg<", html)
         # the unit no longer varies per tab, so the old conditional is gone
         self.assertNotIn("chgUnit", html)
         self.assertIn("row.total_gain_percent", html)
+        # The payload key is internal and unchanged, so the field, the sort and
+        # the row highlight all keep working.
+        self.assertIn("gain: row => Number(row.total_gain_percent || 0)", html)
 
     def test_the_gain_still_colours_by_direction(self):
         html = dashboard.INDEX_HTML
@@ -2371,17 +2526,16 @@ class VolumeSortTests(unittest.TestCase):
 
     def test_the_unsorted_payload_is_neither_way(self):
         out = self._driver("")
-        self.assertEqual(out["before"], ["NSE:MID-EQ", "NSE:LOW-EQ",
-                                         "NSE:HIGH-EQ"])
+        # Rendered without the exchange prefix; the payload still carries it,
+        # and the order is the payload's order.
+        self.assertEqual(out["before"], ["MID-EQ", "LOW-EQ", "HIGH-EQ"])
         self.assertEqual(out["beforeVolumes"], [500, 100, 900])
 
     def test_clicking_volume_sorts_descending_then_ascending(self):
         out = self._driver(self.CLICK_VOLUME)
-        self.assertEqual(out["desc"], ["NSE:HIGH-EQ", "NSE:MID-EQ",
-                                       "NSE:LOW-EQ"])
+        self.assertEqual(out["desc"], ["HIGH-EQ", "MID-EQ", "LOW-EQ"])
         self.assertEqual(out["descVolumes"], [900, 500, 100])
-        self.assertEqual(out["asc"], ["NSE:LOW-EQ", "NSE:MID-EQ",
-                                      "NSE:HIGH-EQ"])
+        self.assertEqual(out["asc"], ["LOW-EQ", "MID-EQ", "HIGH-EQ"])
         self.assertEqual(out["ascVolumes"], [100, 500, 900])
 
     def test_the_sort_survives_a_rerender(self):
@@ -2409,7 +2563,7 @@ class VolumeSortTests(unittest.TestCase):
             + "  input.value = 'MID'; input.fire('input');\n"
             + "  out.afterSearch = syms();\n"
         )
-        self.assertEqual(out["afterSearch"], ["NSE:MID-EQ"])
+        self.assertEqual(out["afterSearch"], ["MID-EQ"])
 
     def test_the_search_box_click_does_not_sort(self):
         out = self._driver(
@@ -2972,17 +3126,19 @@ class StockCountTests(unittest.TestCase):
 
 
 class HeaderColourTests(unittest.TestCase):
-    """The column header text is yellow, and stays yellow on hover.
+    """The column header text is white, and stays legible on its own surface.
 
     A colour change is invisible to a substring test that only proves the
     variable is *used*, so these assert the value and the cascade together.
-    The hue assertions are what make the test survive a later colour change:
-    they fail on any colour outside the yellow band rather than on one literal.
+    The assertions are on achromaticity and contrast rather than one literal,
+    so they survive a later change of shade while still failing on the yellow
+    this replaced, on the grey-blue before it, and on the pink before that.
     """
 
-    #: Yellow sits roughly between 40 and 70 degrees of hue. The header used to
-    #: be the grey-blue at 217 and briefly a pink at 329, both well outside.
-    YELLOW_BAND = (40, 70)
+    #: White is not a hue, so the old hue-band test is gone. These are the
+    #: properties that actually matter: the three channels agree, the value is
+    #: high, and the result is readable against the header background.
+    MIN_CHANNEL = 0xE0
 
     @staticmethod
     def _rule(selector):
@@ -2992,19 +3148,20 @@ class HeaderColourTests(unittest.TestCase):
         return body[:body.index("}")]
 
     @staticmethod
-    def _hue(hex_colour):
-        red, green, blue = (int(hex_colour[i:i + 2], 16) for i in (1, 3, 5))
-        high, low = max(red, green, blue), min(red, green, blue)
-        delta = high - low
-        if delta == 0:
-            return 0.0
-        if high == red:
-            hue = 60 * (((green - blue) / delta) % 6)
-        elif high == green:
-            hue = 60 * (((blue - red) / delta) + 2)
-        else:
-            hue = 60 * (((red - green) / delta) + 4)
-        return hue % 360
+    def _channels(hex_colour):
+        return tuple(int(hex_colour[i:i + 2], 16) for i in (1, 3, 5))
+
+    @staticmethod
+    def _relative_luminance(hex_colour):
+        """WCAG relative luminance, for the contrast check."""
+        def channel(value):
+            ratio = value / 255
+            if ratio <= 0.03928:
+                return ratio / 12.92
+            return ((ratio + 0.055) / 1.055) ** 2.4
+        red, green, blue = (channel(c) for c in
+                            HeaderColourTests._channels(hex_colour))
+        return 0.2126 * red + 0.7152 * green + 0.0722 * blue
 
     def _variable(self, name):
         match = re.search(r"--" + name + r":\s*(#[0-9a-fA-F]{6});",
@@ -3012,53 +3169,66 @@ class HeaderColourTests(unittest.TestCase):
         self.assertIsNotNone(match, f"no --{name} colour defined")
         return match.group(1)
 
-    def _assert_yellow(self, colour, what):
-        hue = self._hue(colour)
-        low, high = self.YELLOW_BAND
-        self.assertTrue(low <= hue <= high,
-                        f"{what} is {colour} at hue {hue:.0f}, outside the "
-                        f"yellow band {low}-{high}")
+    def _assert_white(self, colour, what):
+        red, green, blue = self._channels(colour)
+        self.assertEqual(
+            (red, green, blue), (red, red, red),
+            f"{what} is {colour}, which is tinted rather than white")
+        self.assertGreaterEqual(
+            min(red, green, blue), self.MIN_CHANNEL,
+            f"{what} is {colour}, too dark to read as white")
+
+    def _contrast_against(self, foreground, background):
+        first = self._relative_luminance(foreground)
+        second = self._relative_luminance(background)
+        lighter, darker = max(first, second), min(first, second)
+        return (lighter + 0.05) / (darker + 0.05)
 
     def test_the_header_font_is_the_header_variable(self):
         rule = self._rule("thead th {")
         self.assertIn("color: var(--header);", rule)
         self.assertNotIn("color: var(--muted);", rule)
 
-    def test_the_header_variable_is_yellow(self):
-        self._assert_yellow(self._variable("header"), "--header")
+    def test_the_header_variable_is_white(self):
+        self._assert_white(self._variable("header"), "--header")
 
-    def test_the_hover_variable_is_yellow(self):
-        """Not merely lighter: a pale pink hover must fail this too."""
-        self._assert_yellow(self._variable("header-hover"), "--header-hover")
+    def test_there_is_no_hover_shade_left_behind(self):
+        """White is the top of the range, so a paler hover cannot exist.
 
-    def test_hover_stays_a_lighter_shade_of_the_same_hue(self):
-        """A hover that drifts to another hue reads as a different colour."""
-        base = self._hue(self._variable("header"))
-        hover = self._hue(self._variable("header-hover"))
-        self.assertLess(abs(base - hover), 20,
-                        f"hover hue {hover:.0f} is far from base {base:.0f}")
-        base_rgb = self._variable("header")[1:]
-        hover_rgb = self._variable("header-hover")[1:]
-        for name, low, high in (("red", 0, 1), ("green", 2, 3), ("blue", 4, 5)):
-            with self.subTest(channel=name):
-                self.assertGreaterEqual(
-                    int(hover_rgb[low:high], 16), int(base_rgb[low:high], 16),
-                    f"hover {name} should not be darker than the base")
+        The variable is removed rather than pointed at the same value, so a
+        later edit cannot quietly reintroduce a tint on hover.
+        """
+        html = dashboard.INDEX_HTML
+        self.assertNotIn("--header-hover", html)
+        rule = self._rule("thead th.sortable:hover {")
+        self.assertNotIn("color:", rule)
+        # The affordance moved to the background rather than disappearing.
+        self.assertIn("background: var(--surface);", rule)
 
-    def test_hover_rule_uses_the_hover_variable(self):
-        self.assertIn("color: var(--header-hover);",
-                      self._rule("thead th.sortable:hover {"))
+    def test_the_header_is_readable_on_its_own_surface(self):
+        """17:1 in practice; 7:1 is the AAA floor and leaves headroom."""
+        ratio = self._contrast_against(self._variable("header"),
+                                       self._variable("surface-2"))
+        self.assertGreaterEqual(ratio, 7.0,
+                                f"header contrast is only {ratio:.1f}:1")
+
+    def test_the_count_pill_is_readable_on_its_own_surface(self):
+        """The pill sits on --surface rather than --surface-2."""
+        self._assert_white(self._variable("header"), "the count pill")
+        ratio = self._contrast_against(self._variable("header"),
+                                       self._variable("surface"))
+        self.assertGreaterEqual(ratio, 7.0,
+                                f"count pill contrast is only {ratio:.1f}:1")
 
     def test_the_active_sort_is_still_distinguishable(self):
-        """All-yellow headers would leave the sorted column unmarked."""
+        """White headers would leave the sorted column unmarked on colour."""
         self.assertIn("color: var(--accent);",
                       self._rule("thead th.sortable.sorted {"))
-        # the accent is blue, so it cannot be mistaken for the header yellow
-        self._assert_yellow(self._variable("header"), "--header")
-        accent = self._hue("#4f8cff")
-        low, high = self.YELLOW_BAND
-        self.assertFalse(low <= accent <= high,
-                         "the sort accent must stay out of the yellow band")
+        # The accent is blue and the header is white, so they cannot be
+        # mistaken for one another.
+        accent = self._channels("#4f8cff")
+        self.assertNotEqual(accent[0], accent[1],
+                            "the sort accent must not be white")
 
     def test_the_stock_count_pill_follows_the_header(self):
         self.assertIn("color: var(--header);", self._rule("thead th .col-count {"))

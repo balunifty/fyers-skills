@@ -13,8 +13,8 @@ REM   run_equity_ema_crossover_15min.bat live once
 REM =============================================================================
 
 REM Override PYTHON if Python is not on PATH, for example:
-REM set PYTHON=C:\Users\Admin\AppData\Local\Programs\Python\Python311\python.exe
-if not defined PYTHON set "PYTHON=python"
+REM set PYTHON=C:\Users\Admin\AppData\Local\Programs\Python\Python311\pythonw.exe
+if not defined PYTHON set "PYTHON=pythonw"
 
 for %%I in ("%~dp0..\..") do set "WORKDIR=%%~fI"
 set "SCRIPT=%WORKDIR%\strategies\scripts\EquityEma15_10_20_50Crossover15min.py"
